@@ -1,29 +1,30 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { supabase } from '../supabase'
 import { useUserStore } from '../stores/user-store'
 import { useRouter } from 'vue-router'
+import isEmail from 'validator/lib/isEmail'
 
-const email = ref('');
-const confirmEmail = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const firstName = ref('');
-const lastName = ref('');
+const email = ref('')
+const confirmEmail = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const firstName = ref('')
+const lastName = ref('')
 
-const signUpMode = ref(false);
+const signUpMode = ref(false)
 
 const userStore = useUserStore()
 const router = useRouter()
+
+const isValidEmail = computed(() => isEmail(email.value) && email.value === confirmEmail.value)
+const isValidPassword = computed(() => password.value === confirmPassword.value)
 
 const submitedForm = async () => {
   if (signUpMode.value) {
     try {
       const { error } = await supabase.auth.signUp(
-        {
-        email: email.value,
-        password: password.value
-        },
+        { email: email.value, password: password.value },
         {
           data: {
             firstName: firstName.value,
@@ -42,10 +43,8 @@ const submitedForm = async () => {
     }
   } else {
     try {
-      const { user, error } = await supabase.auth.signIn({
-        email: email.value,
-        password: password.value
-      })
+      const { user, error } = await supabase.auth.signIn(
+        { email: email.value, password: password.value })
 
       if (error) throw error
 
@@ -61,15 +60,10 @@ const submitedForm = async () => {
     }
   }
 }
-
-const changeMode = () => {
-  signUpMode.value = !signUpMode.value
-}
-
 </script>
 
 <template>
-  <div v-if="!userStore.login" class="">
+  <div v-if="!userStore.login">
     <!-- disabled reloading -->
     <form class="" @submit.prevent="submitedForm">
       <div>
@@ -98,11 +92,13 @@ const changeMode = () => {
         <input type="password" id="confirmPassword" v-model="confirmPassword" required />
       </div>
       <div>
-        <button type="submit">{{ signUpMode ? 'Sign up' : 'Sign in' }}</button>
+        <button type="submit">{{ (signUpMode) ? 'Sign up' : 'Sign in' }}</button>
       </div>
       <div>
         <!-- Just for development purposes -->
-        <button type="button" @click="changeMode">changeMode</button>
+        <button type="button" @click="signUpMode = !signUpMode">
+          changeMode
+        </button>
       </div>
     </form>
   </div>

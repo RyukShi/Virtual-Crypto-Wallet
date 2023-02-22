@@ -1,9 +1,9 @@
 <script setup>
-import SupabaseAuth from '../components/SupabaseAuth.vue';
+import SupabaseAuth from '../components/SupabaseAuth.vue'
 </script>
 
 <template>
-  <div class="">
+  <div>
     <SupabaseAuth />
   </div>
 </template>
