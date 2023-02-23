@@ -1,6 +1,7 @@
 <script setup>
 import { useAPIStore } from '../stores/api-store'
 import { RouterLink } from 'vue-router'
+import { formatedNumber } from '../utils'
 
 const APIStore = useAPIStore()
 
@@ -28,8 +29,8 @@ const props = defineProps({
         <tr v-for="(asset, i) in props.assets" :key="asset.asset_id">
           <td class="custom-cell">{{ i + 1 }}</td>
           <td class="custom-cell"><strong>{{ asset.name }}</strong> ({{ asset.asset_id }})</td>
-          <td class="custom-cell">$ {{ asset.price_usd }}</td>
-          <td class="custom-cell">$ {{ asset.volume_1day_usd }}</td>
+          <td class="custom-cell">{{ formatedNumber(asset.price_usd) }}</td>
+          <td class="custom-cell">{{ formatedNumber(asset.volume_1day_usd) }}</td>
           <td class="custom-cell">
             <RouterLink :to="{ name: 'asset-details' }" role="button" class="btn btn-sky"
             @click="APIStore.selectedAsset = asset">
