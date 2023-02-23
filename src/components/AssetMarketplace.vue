@@ -25,7 +25,9 @@ const getFilteredAsset = computed(() => {
   return APIStore.assets.filter(asset =>
     (selectedType.value === 'all' || isCrypto.value === !!asset.type_is_crypto) &&
     !isNaN(asset.price_usd) && asset.price_usd > 0 &&
-    asset.volume_1day_usd > Math.pow(10, 7)
+    asset.volume_1day_usd > Math.pow(10, 7) &&
+    ((assetInput.value === null) || (asset.name.toLowerCase().includes(assetInput.value.toLowerCase()) ||
+    asset.asset_id.toLowerCase() === assetInput.value.toLowerCase()))
   )
 })
 </script>
