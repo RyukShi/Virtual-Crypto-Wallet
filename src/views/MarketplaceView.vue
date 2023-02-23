@@ -4,7 +4,7 @@ import AssetMarketplace from '../components/AssetMarketplace.vue'
 
 <template>
   <div>
-    <h1>Marketplace</h1>
+    <h1 class="main-title">Marketplace</h1>
     <AssetMarketplace />
   </div>
 </template>

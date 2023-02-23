@@ -17,25 +17,37 @@ const props = defineProps({
 </script>
 
 <template>
-  <table>
-    <thead>
-      <tr>
-        <th v-for="c in props.columns" :key="c">{{ c }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(asset, i) in props.assets" :key="asset.asset_id">
-        <td>{{ i + 1 }}</td>
-        <td><strong>{{ asset.name }}</strong> ({{ asset.asset_id }})</td>
-        <td>$ {{ asset.price_usd }}</td>
-        <td>$ {{ asset.volume_1day_usd }}</td>
-        <td>
-          <RouterLink :to="{ name: 'asset-details' }" role="button" class="p-2"
-          @click="APIStore.selectedAsset = asset">
-            View
-          </RouterLink>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="container">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th class="custom-cell" v-for="c in props.columns" :key="c">{{ c }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(asset, i) in props.assets" :key="asset.asset_id">
+          <td class="custom-cell">{{ i + 1 }}</td>
+          <td class="custom-cell"><strong>{{ asset.name }}</strong> ({{ asset.asset_id }})</td>
+          <td class="custom-cell">$ {{ asset.price_usd }}</td>
+          <td class="custom-cell">$ {{ asset.volume_1day_usd }}</td>
+          <td class="custom-cell">
+            <RouterLink :to="{ name: 'asset-details' }" role="button" class="btn btn-sky"
+            @click="APIStore.selectedAsset = asset">
+              View
+            </RouterLink>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
+
+<style scoped>
+.custom-table {
+  @apply border-collapse border-2 border-slate-50 w-full text-center bg-sky-900;
+}
+
+.custom-cell {
+  @apply p-4;
+}
+</style>

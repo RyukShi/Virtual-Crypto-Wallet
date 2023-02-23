@@ -2,6 +2,7 @@
 import { ref, computed, onBeforeMount } from 'vue'
 import { useAPIStore } from '../stores/api-store'
 import CustomTable from './CustomTable.vue'
+import CubeLoader from './CubeLoader.vue'
 
 const APIStore = useAPIStore()
 
@@ -30,15 +31,19 @@ const getFilteredAsset = computed(() => {
 </script>
 
 <template>
-  <div v-if="!APIStore.loading">
-    <h2>Filters</h2>
-    <select v-model="selectedType">
-      <option v-for="t in TYPE_OPTIONS" :key="t.value" :value="t.value">
-        {{ t.label }}
-      </option>
-    </select>
-    <input type="text" v-model="assetInput" placeholder="Asset ID or Name" />
+  <div v-if="!APIStore.loading" class="my-20">
+    <h2 class="sub-title text-center">* Filters *</h2>
+    <div class="centered gap-x-4 mb-20">
+      <select v-model="selectedType">
+        <option v-for="t in TYPE_OPTIONS" :key="t.value" :value="t.value">
+          {{ t.label }}
+        </option>
+      </select>
+      <input type="text" v-model="assetInput" placeholder="Asset ID or Name" />
+    </div>
     <CustomTable :columns="columns" :assets="getFilteredAsset" />
   </div>
-  <p v-else class="text-center text-xl">Loading ...</p>
+  <div v-else class="centered my-20">
+    <CubeLoader />
+  </div>
 </template>

@@ -63,43 +63,37 @@ const submitedForm = async () => {
 </script>
 
 <template>
-  <div v-if="!userStore.login">
+  <div class="centered" v-if="!userStore.login">
     <!-- disabled reloading -->
-    <form class="" @submit.prevent="submitedForm">
+    <form class="auth-form" @submit.prevent="submitedForm">
       <div>
-        <label for="email">Email</label>
-        <input type="email" id="email" v-model="email" required />
+        <input type="email" v-model="email" required placeholder="Your e-mail" />
       </div>
       <div v-if="signUpMode">
-        <label for="confirmEmail">Confirm email</label>
-        <input type="email" id="confirmEmail" v-model="confirmEmail" required />
+        <input type="email" v-model="confirmEmail" required placeholder="Confirm your e-mail" />
+      </div>
+      <div class="flex gap-x-4" v-if="signUpMode">
+        <input type="text" v-model="firstName" required placeholder="Your firstname" />
+        <input type="text" v-model="lastName" required placeholder="Your lastname" />
+      </div>
+      <div>
+        <input type="password" v-model="password" required placeholder="Your password" />
       </div>
       <div v-if="signUpMode">
-
-        <label for="firstName">First name</label>
-        <input type="text" id="firstName" v-model="firstName" required />
-
-        <label for="lastName">Last name</label>
-        <input type="text" id="lastName" v-model="lastName" required />
-
+        <input type="password" v-model="confirmPassword" required placeholder="Confirm your password" />
       </div>
-      <div>
-        <label for="password">Password</label>
-        <input type="password" id="password" v-model="password" required />
-      </div>
-      <div v-if="signUpMode">
-        <label for="confirmPassword">Confirm password</label>
-        <input type="password" id="confirmPassword" v-model="confirmPassword" required />
-      </div>
-      <div>
-        <button type="submit">{{ (signUpMode) ? 'Sign up' : 'Sign in' }}</button>
-      </div>
-      <div>
-        <!-- Just for development purposes -->
-        <button type="button" @click="signUpMode = !signUpMode">
-          changeMode
+      <div class="centered gap-x-4">
+        <button class="btn btn-sky" type="submit">{{ (signUpMode) ? 'Sign up' : 'Sign in' }}</button>
+        <button class="btn btn-sky" type="button" @click="signUpMode = !signUpMode">
+          {{ (signUpMode) ? 'You have already an account ?' : 'Register now !' }}
         </button>
       </div>
     </form>
   </div>
 </template>
+
+<style scoped>
+.auth-form {
+  @apply my-10 p-10 bg-sky-900 rounded-lg flex flex-col gap-y-6;
+}
+</style>
