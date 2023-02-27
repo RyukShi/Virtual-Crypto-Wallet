@@ -11,6 +11,7 @@ const userStore = useUserStore()
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/about">About</RouterLink>
       <RouterLink v-if="!userStore.login" to="/login">Login</RouterLink>
+      <RouterLink v-else to="/my-wallet">Wallet</RouterLink>
     </nav>
   </div>
 
@@ -25,6 +26,9 @@ nav {
   hover:px-48 duration-700 hover:bg-transparent hover:border-amber-500;
 }
 nav a.router-link-exact-active {
-  @apply text-amber-500;
+  @apply border-b-2 border-amber-500;
+}
+nav a {
+  @apply hover:text-amber-500 px-2;
 }
 </style>

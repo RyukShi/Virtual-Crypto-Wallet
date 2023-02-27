@@ -71,7 +71,8 @@ const submitedForm = async () => {
         {
           data: {
             firstName: firstName.value,
-            lastName: lastName.value
+            lastName: lastName.value,
+            initialBalance: 5000
           }
         }
       )
@@ -79,6 +80,7 @@ const submitedForm = async () => {
       if (error) throw error
 
       alert('Check your email to confirm your registration !')
+      router.push({ name: 'marketplace' })
 
     } catch (error) {
       console.log(error);
@@ -95,7 +97,7 @@ const submitedForm = async () => {
       userStore.login = true
 
       // redirect to my-wallet page
-      router.push('/my-wallet')
+      router.push({ name: 'my-wallet' })
 
     } catch (error) {
       console.log(error);
