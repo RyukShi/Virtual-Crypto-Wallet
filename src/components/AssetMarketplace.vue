@@ -1,10 +1,9 @@
 <script setup>
-import { ref, computed, onBeforeMount } from 'vue'
-import { useAPIStore } from '../stores/api-store'
+import { ref, computed, onBeforeMount, inject } from 'vue'
 import CustomTable from './CustomTable.vue'
 import CubeLoader from './CubeLoader.vue'
 
-const APIStore = useAPIStore()
+const APIStore = inject('APIStore')
 
 onBeforeMount(() => APIStore.getAssetsFromAPI())
 

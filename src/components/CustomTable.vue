@@ -1,9 +1,9 @@
 <script setup>
-import { useAPIStore } from '../stores/api-store'
 import { RouterLink } from 'vue-router'
 import { formatedNumber } from '../utils'
+import { inject } from 'vue'
 
-const APIStore = useAPIStore()
+const APIStore = inject('APIStore')
 
 const props = defineProps({
   columns: {

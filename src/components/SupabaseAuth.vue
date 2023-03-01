@@ -1,7 +1,6 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, inject } from 'vue'
 import { supabase } from '../supabase'
-import { useUserStore } from '../stores/user-store'
 import { useRouter } from 'vue-router'
 import isEmail from 'validator/lib/isEmail'
 
@@ -21,7 +20,7 @@ const errorMessages = {
   confirmPassword: null,
 }
 
-const userStore = useUserStore()
+const userStore = inject('userStore')
 const router = useRouter()
 
 const isSameEmail = computed(() => email.value === confirmEmail.value)
@@ -83,7 +82,6 @@ const submitedForm = async () => {
       router.push({ name: 'marketplace' })
 
     } catch (error) {
-      console.log(error);
       alert(error.error_description || error.message)
     }
   } else {
@@ -93,14 +91,13 @@ const submitedForm = async () => {
 
       if (error) throw error
 
-      userStore.setUser(user)
-      userStore.login = true
+      userStore.user = user
+      userStore.isAuthenticated = true
 
       // redirect to my-wallet page
       router.push({ name: 'my-wallet' })
 
     } catch (error) {
-      console.log(error);
       alert(error.error_description || error.message)
     }
   }

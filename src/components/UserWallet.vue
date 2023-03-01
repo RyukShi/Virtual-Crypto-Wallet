@@ -1,10 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { formatedNumber } from '../utils'
-import { useUserStore } from '../stores/user-store'
 import { useRouter } from 'vue-router'
 
-const userStore = useUserStore()
+const userStore = inject('userStore')
 const router = useRouter()
 
 const userMetadata = userStore.user.user_metadata

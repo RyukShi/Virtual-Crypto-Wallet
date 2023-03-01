@@ -1,8 +1,8 @@
 <script setup>
-import { useAPIStore } from '../stores/api-store'
 import { formatedNumber } from '../utils'
+import { inject } from 'vue'
 
-const APIStore = useAPIStore()
+const APIStore = inject('APIStore')
 const asset = APIStore.selectedAsset
 </script>
 

@@ -1,8 +1,8 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import { useUserStore } from './stores/user-store'
+import { inject } from 'vue'
 
-const userStore = useUserStore()
+const userStore = inject('userStore')
 </script>
 
 <template>
@@ -10,7 +10,7 @@ const userStore = useUserStore()
     <nav>
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/about">About</RouterLink>
-      <RouterLink v-if="!userStore.login" to="/login">Login</RouterLink>
+      <RouterLink v-if="!userStore.isAuthenticated" to="/login">Login</RouterLink>
       <RouterLink v-else to="/my-wallet">Wallet</RouterLink>
     </nav>
   </div>
