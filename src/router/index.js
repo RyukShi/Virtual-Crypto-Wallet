@@ -41,6 +41,33 @@ const router = createRouter({
       beforeEnter: [isAuthenticatedFully]
     },
     {
+      path: '/account-recovery',
+      name: 'account-recovery',
+      component: () => import('../views/AccountRecoveryView.vue')
+    },
+    {
+      path: '/recovery-password',
+      name: 'recovery-password',
+      component: () => import('../views/RecoveryPasswordView.vue'),
+      beforeEnter: (to, _from, next) => {
+        const hash = to.hash
+        if (!hash) next({ name: 'marketplace' })
+        else {
+          const urlParams = new URLSearchParams(hash.slice(1))
+          const error = urlParams.get('error')
+          if (error) {
+            const errorCode = urlParams.get('error_code')
+            const errorDescription = urlParams.get('error_description')
+            alert(`Error ${errorCode}: ${errorDescription}`)
+            next({ name: 'marketplace' })
+          }
+          const accessToken = urlParams.get('access_token')
+          if (!accessToken) next({ name: 'marketplace' })
+          else next()
+        }
+      }
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       redirect: { name: 'home' }

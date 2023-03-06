@@ -3,6 +3,7 @@ import { ref, computed, watch, inject } from 'vue'
 import { supabase } from '../supabase'
 import { useRouter } from 'vue-router'
 import isEmail from 'validator/lib/isEmail'
+import { isSecurePassword } from '../utils'
 
 const email = ref('')
 const confirmEmail = ref('')
@@ -26,7 +27,7 @@ const router = useRouter()
 const isSameEmail = computed(() => email.value === confirmEmail.value)
 const isSamePassword = computed(() => password.value === confirmPassword.value)
 const isValidEmail = computed(() => isEmail(email.value))
-const isValidPassword = computed(() => password.value.length >= 8)
+const isValidPassword = computed(() => isSecurePassword(password.value))
 const isFormComplete = computed(() => {
   let formFields = null
   if (signUpMode.value) {
@@ -133,6 +134,7 @@ const submitedForm = async () => {
         <button class="btn btn-sky" type="button" @click="signUpMode = !signUpMode">
           {{ (signUpMode) ? 'You have already an account ?' : 'Register now !' }}
         </button>
+        <RouterLink v-if="!signUpMode" to="/account-recovery">Forgot password ?</RouterLink>
       </div>
     </form>
   </div>
