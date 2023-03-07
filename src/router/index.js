@@ -4,6 +4,7 @@ import AssetDetailsView from '../views/AssetDetailsView.vue'
 import MarketplaceView from '../views/MarketplaceView.vue'
 import UserWalletView from '../views/UserWalletView.vue'
 import { useUserStore } from '../stores/user-store'
+import { useAPIStore } from '../stores/api-store'
 
 const isAuthenticatedFully = (to, _from, next) => {
   const userStore = useUserStore()
@@ -22,7 +23,12 @@ const router = createRouter({
     {
       path: '/asset-details',
       name: 'asset-details',
-      component: AssetDetailsView
+      component: AssetDetailsView,
+      beforeEnter: (_to, _from, next) => {
+        const APIStore = useAPIStore()
+        if (!APIStore.selectedAsset) next({ name: 'marketplace' })
+        else next()
+      }
     },
     {
       path: '/about',
