@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject } from 'vue'
+import { ref, inject, computed } from 'vue'
 import isEmail from 'validator/lib/isEmail'
 import { useRouter } from 'vue-router'
 
@@ -7,6 +7,8 @@ const router = useRouter()
 
 const emailRecovery = ref('')
 const userStore = inject('userStore')
+
+const isValidEmail = computed(() => isEmail(emailRecovery.value))
 
 const handleSubmit = async () => {
   await userStore.sendRecoveryPasswordLink(emailRecovery.value)
@@ -16,15 +18,25 @@ const handleSubmit = async () => {
 
 <template>
   <div class="centered">
-    <form class="my-10 p-10 bg-sky-700 rounded-lg flex flex-col gap-y-6 items-center"
+    <form class="auth-form"
       @submit.prevent="handleSubmit">
-      <input type="email" v-model="emailRecovery" placeholder="Enter your e-mail" />
-      <button
-        :disabled="!isEmail(emailRecovery)"
-        type="submit"
-        class="btn btn-sky">
-        Send me recovery link
-      </button>
+      <div>
+        <input type="email" v-model="emailRecovery" placeholder="Enter your e-mail" />
+        <p v-if="emailRecovery && !isValidEmail" class="error-message">Invalid email</p>
+      </div>
+      <div class="flex gap-x-4">
+        <button
+          :disabled="!isValidEmail"
+          type="submit"
+          class="btn btn-sky">
+          Send me recovery link
+        </button>
+        <RouterLink
+          class="btn btn-rose"
+          to="/login">
+          Cancel
+        </RouterLink>
+      </div>
     </form>
   </div>
 </template>

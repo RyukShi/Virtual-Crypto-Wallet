@@ -53,4 +53,12 @@
     .sub-title {
         @apply text-2xl my-4 text-amber-500;
     }
+
+    .auth-form {
+        @apply my-10 p-10 bg-sky-700 rounded-lg flex flex-col gap-y-6;
+    }
+
+    .error-message {
+        @apply text-sm mt-2 px-2 bg-rose-500 max-w-max rounded-lg;
+    }
 }

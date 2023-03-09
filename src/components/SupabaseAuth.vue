@@ -42,7 +42,7 @@ const isFormComplete = computed(() => {
 })
 
 const isValidForm = computed(() => {
-  if (!isFormComplete.value || !isValidEmail.value || !isValidPassword.value) return false
+  if (!isFormComplete.value || !isValidEmail.value || !isValidPassword.value[0]) return false
   else if (confirmEmail.value && !isSameEmail.value) return false
   else if (confirmPassword.value && !isSamePassword.value) return false
   else return true
@@ -59,7 +59,7 @@ watch([isValidEmail, isSameEmail, isSamePassword, isValidPassword], (values) => 
   if (signUpMode.value && !samePassword) errorMessages.confirmPassword = 'Passwords do not match'
   else errorMessages.confirmPassword = null
 
-  if (signUpMode.value && !validPassword) errorMessages.password = 'Password must be at least 8 characters'
+  if (signUpMode.value && !validPassword[0]) errorMessages.password = validPassword[1]
   else errorMessages.password = null
 })
 
@@ -106,7 +106,7 @@ const submitedForm = async () => {
 </script>
 
 <template>
-  <div class="centered" v-if="!userStore.login">
+  <div class="centered">
     <!-- disabled reloading -->
     <form class="auth-form" @submit.prevent="submitedForm">
       <div>
@@ -139,13 +139,3 @@ const submitedForm = async () => {
     </form>
   </div>
 </template>
-
-<style scoped>
-.auth-form {
-  @apply my-10 p-10 bg-sky-700 rounded-lg flex flex-col gap-y-6;
-}
-
-.error-message {
-  @apply text-sm mt-2 px-2 bg-rose-500 max-w-max rounded-lg;
-}
-</style>

@@ -13,7 +13,7 @@ const isSamePassword = computed(() => newPassword.value === confirmNewPassword.v
 const isValidPassword = computed(() => isSecurePassword(newPassword.value))
 const isValidForm = computed(() => {
   if (newPassword.value && !isSamePassword.value) return false
-  else if (!isValidPassword.value) return false
+  else if (!isValidPassword.value[0]) return false
   else return true
 })
 
@@ -25,10 +25,16 @@ const handleSubmit = async () => {
 
 <template>
   <div class="centered">
-    <form class="my-10 p-10 bg-sky-700 rounded-lg flex flex-col gap-y-6 items-center"
+    <form class="auth-form"
       @submit.prevent="handleSubmit">
-      <input type="password" v-model="newPassword" required placeholder="Enter your new password" />
-      <input type="password" v-model="confirmNewPassword" required placeholder="Confirm your new password" />
+      <div>
+        <input type="password" v-model="newPassword" required placeholder="Enter your new password" />
+        <p v-if="newPassword && !isValidPassword[0]" class="error-message">{{ isValidPassword[1] }}</p>
+      </div>
+      <div>
+        <input type="password" v-model="confirmNewPassword" required placeholder="Confirm your new password" />
+        <p v-if="confirmNewPassword && !isSamePassword" class="error-message">Passwords do not match</p>
+      </div>
       <button class="btn btn-sky" type="submit" :disabled="!isValidForm">
         Change my password
       </button>
