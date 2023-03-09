@@ -2,6 +2,7 @@
 import { ref, computed, inject } from 'vue'
 import { formatedNumber } from '../utils'
 import { useRouter } from 'vue-router'
+import CustomChart from './CustomChart.vue'
 
 const userStore = inject('userStore')
 const router = useRouter()
@@ -39,6 +40,23 @@ const signOut = async () => {
   await userStore.logout()
   router.push({ name: 'marketplace' })
 }
+
+const data = {
+  labels: [
+    'Red',
+    'Blue',
+    'Yellow'
+  ],
+  datasets: [{
+    data: [300, 50, 100],
+    backgroundColor: [
+      'rgb(255, 99, 132)',
+      'rgb(54, 162, 235)',
+      'rgb(255, 205, 86)'
+    ],
+    hoverOffset: 4
+  }]
+}
 </script>
 
 <template>
@@ -52,5 +70,8 @@ const signOut = async () => {
       </button>
       <button class="btn btn-rose" @click="signOut">Sign out</button>
     </div>
+
+    <CustomChart v-if="!privateMode" type="doughnut" :data="data"
+      title="Allocation" />
   </div>
 </template>
