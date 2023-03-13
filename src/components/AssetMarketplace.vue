@@ -9,20 +9,18 @@ onBeforeMount(() => APIStore.getAssetsFromAPI())
 
 const TYPE_OPTIONS = [
   { value: 'all', label: 'All'},
-  { value: 'crypto', label: 'Crypto' },
-  { value: 'fiat', label: 'Fiat' }
+  { value: 1, label: 'Crypto' },
+  { value: 0, label: 'Fiat' }
 ]
 const columns = ['#', 'Name', 'Price', 'Day Volume', 'Details']
 /* refs */
 const assetInput = ref(null)
-const selectedType = ref('crypto')
-/* computed refs */
-const isCrypto = computed(() => selectedType.value === 'crypto')
+const selectedType = ref(1)
 
 const getFilteredAsset = computed(() => {
   // filtering assets for faster rendering
   return APIStore.assets.filter(asset =>
-    (selectedType.value === 'all' || isCrypto.value === !!asset.type_is_crypto) &&
+    (selectedType.value === 'all' || selectedType.value === asset.type_is_crypto) &&
     !isNaN(asset.price_usd) && asset.price_usd > 0 &&
     asset.volume_1day_usd > Math.pow(10, 7) &&
     ((assetInput.value === null) || (asset.name.toLowerCase().includes(assetInput.value.toLowerCase()) ||
