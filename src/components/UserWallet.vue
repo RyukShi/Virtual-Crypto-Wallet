@@ -1,14 +1,33 @@
 <script setup>
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, onBeforeMount } from 'vue'
 import { formatedNumber } from '../utils'
 import { useRouter } from 'vue-router'
 import CustomChart from './CustomChart.vue'
 
 const userStore = inject('userStore')
+const APIStore = inject('APIStore')
 const router = useRouter()
+const data = ref(null)
 
 const userMetadata = userStore.user.user_metadata
+const userCurrency = userMetadata.digitalCurrencyPortfolio
 const stars = '********'
+
+onBeforeMount(async () => {
+  if (userCurrency) {
+    let assets = await Promise.all(userCurrency.map(a => APIStore.getAssetById(a.asset_id)))
+    /* flat assets array */
+    assets = assets.flat()
+    data.value = {
+      labels: userCurrency.map(a => a.asset_id),
+      datasets: [{
+        data: userCurrency.map(a => a.balance * assets.find(asset => asset.asset_id === a.asset_id).price_usd),
+        backgroundColor: userCurrency.map(a => a.color),
+        hoverOffset: 4
+      }]
+    }
+  }
+})
 
 const Accountbalance = ref(userMetadata.initialBalance)
 const privateMode = ref(false)
@@ -40,23 +59,6 @@ const signOut = async () => {
   await userStore.logout()
   router.push({ name: 'marketplace' })
 }
-
-const data = {
-  labels: [
-    'Red',
-    'Blue',
-    'Yellow'
-  ],
-  datasets: [{
-    data: [300, 50, 100],
-    backgroundColor: [
-      'rgb(255, 99, 132)',
-      'rgb(54, 162, 235)',
-      'rgb(255, 205, 86)'
-    ],
-    hoverOffset: 4
-  }]
-}
 </script>
 
 <template>
@@ -71,7 +73,7 @@ const data = {
       <button class="btn btn-rose" @click="signOut">Sign out</button>
     </div>
 
-    <CustomChart v-if="!privateMode" type="doughnut" :data="data"
+    <CustomChart v-if="!privateMode && data" type="doughnut" :data="data"
       title="Allocation" />
   </div>
 </template>

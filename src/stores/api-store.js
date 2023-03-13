@@ -7,7 +7,7 @@ export const useAPIStore = defineStore('api-store', () => {
   const loading = ref(false)
   const selectedAsset = ref(null)
 
-  const COINAPI_URI = 'https://rest.coinapi.io/v1/'
+  const COINAPI_URI = 'https://rest.coinapi.io/v1'
 
   const CONFIG = {
     method: "GET",
@@ -20,7 +20,7 @@ export const useAPIStore = defineStore('api-store', () => {
   const getAssetsFromAPI = () => {
     loading.value = true
     // fetch assets data from API
-    fetch(COINAPI_URI + 'assets', CONFIG)
+    fetch(`${COINAPI_URI}/assets`, CONFIG)
       .then(async (response) => {
         const assetsJsonData = await response.json()
         assets.value = assetsJsonData
@@ -33,7 +33,7 @@ export const useAPIStore = defineStore('api-store', () => {
   const getExchangesFromAPI = () => {
     loading.value = true
     // fetch exchanges data from API
-    fetch(COINAPI_URI + 'exchanges', CONFIG)
+    fetch(`${COINAPI_URI}/exchanges`, CONFIG)
       .then(async (response) => {
         const exchangesJsonData = await response.json()
         exchanges.value = exchangesJsonData
@@ -43,8 +43,20 @@ export const useAPIStore = defineStore('api-store', () => {
       .finally(() => loading.value = false)
   }
 
+  const getAssetById = async (assetId) => {
+    try {
+      const response = await fetch(`${COINAPI_URI}/assets/${assetId}`, CONFIG)
+      const jsonAsset = await response.json()
+      return jsonAsset
+    } catch (error) {
+      console.error(`Error fetching asset ${assetId}: ${error}`)
+      return null
+    }
+  }
+
   return {
     assets, exchanges, loading, selectedAsset,
-    getAssetsFromAPI, getExchangesFromAPI
+    getAssetsFromAPI, getExchangesFromAPI,
+    getAssetById
   }
 })
