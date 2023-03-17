@@ -3,6 +3,7 @@ import LoginView from '../views/LoginView.vue'
 import AssetDetailsView from '../views/AssetDetailsView.vue'
 import MarketplaceView from '../views/MarketplaceView.vue'
 import UserWalletView from '../views/UserWalletView.vue'
+import SwappingAssetsView from '../views/SwappingAssetsView.vue'
 import { useUserStore } from '../stores/user-store'
 import { useAPIStore } from '../stores/api-store'
 
@@ -77,6 +78,12 @@ const router = createRouter({
       path: '/not-found',
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue')
+    },
+    {
+      path: '/swapping',
+      name: 'swapping',
+      component: SwappingAssetsView,
+      beforeEnter: [isAuthenticatedFully]
     },
     {
       path: '/:pathMatch(.*)*',

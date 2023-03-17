@@ -26,7 +26,7 @@ export const useAPIStore = defineStore('api-store', () => {
         assets.value = assetsJsonData
         console.log('Assets lodaded from API')
       })
-      .catch(error => console.log(error))
+      .catch(error => console.error(error))
       .finally(() => loading.value = false)
   }
 
@@ -39,7 +39,7 @@ export const useAPIStore = defineStore('api-store', () => {
         exchanges.value = exchangesJsonData
         console.log('Exchanges loaded from API')
       })
-      .catch(error => console.log(error))
+      .catch(error => console.error(error))
       .finally(() => loading.value = false)
   }
 

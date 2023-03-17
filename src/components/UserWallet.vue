@@ -9,32 +9,32 @@ const APIStore = inject('APIStore')
 const router = useRouter()
 const data = ref(null)
 
-const userMetadata = userStore.user.user_metadata
-const userCurrency = userMetadata.digitalCurrencyPortfolio
+const { digitalWallet, initialBalance,
+        firstName, lastName } = userStore.user.user_metadata
 const stars = '********'
 
 onBeforeMount(async () => {
-  if (userCurrency) {
-    let assets = await Promise.all(userCurrency.map(a => APIStore.getAssetById(a.asset_id)))
+  if (digitalWallet) {
+    let assets = await Promise.all(digitalWallet.map(a => APIStore.getAssetById(a.asset_id)))
     /* flat assets array */
     assets = assets.flat()
     data.value = {
-      labels: userCurrency.map(a => a.asset_id),
+      labels: digitalWallet.map(a => a.asset_id),
       datasets: [{
-        data: userCurrency.map(a => a.balance * assets.find(asset => asset.asset_id === a.asset_id).price_usd),
-        backgroundColor: userCurrency.map(a => a.color),
+        data: digitalWallet.map(a => a.balance * assets.find(asset => asset.asset_id === a.asset_id).price_usd),
+        backgroundColor: digitalWallet.map(a => a.color),
         hoverOffset: 4
       }]
     }
   }
 })
 
-const Accountbalance = ref(userMetadata.initialBalance)
+const Accountbalance = ref(initialBalance)
 const privateMode = ref(false)
 const profitLoss = ref(100.118)
 
 const fullName = computed(() => {
-  return `${userMetadata.firstName} ${userMetadata.lastName}`
+  return `${firstName} ${lastName}`
 })
 
 const formatedAccountBalance = computed(() => {

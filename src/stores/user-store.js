@@ -15,7 +15,7 @@ export const useUserStore = defineStore('user-store', () => {
       isAuthenticated.value = false
     } catch (error) {
       alert("An error has occurred during the logout process.")
-      console.log(error)
+      console.error(error)
     }
   }
 
@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user-store', () => {
 
     } catch (error) {
       alert("An error has occurred during the process, please try again later.")
-      console.log(error)
+      console.error(error)
     }
   }
 
@@ -42,12 +42,24 @@ export const useUserStore = defineStore('user-store', () => {
       alert("Your password has been successfully reinitialized, you'll be soon redirected to the login page.")
     } catch (error) {
       alert("An error has occurred during the recovery password process, please try again later.")
-      console.log(error)
+      console.error(error)
+    }
+  }
+
+  const updateDigitalWallet = async (newDigitalWallet) => {
+    try {
+      const { error } = await supabase.auth.update({
+        data: { digitalWallet: newDigitalWallet }
+      })
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
     }
   }
 
   return {
     user, isAuthenticated, logout,
-    sendRecoveryPasswordLink, updatePassword
+    sendRecoveryPasswordLink, updatePassword,
+    updateDigitalWallet
   }
 })
