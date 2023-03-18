@@ -75,9 +75,9 @@ const submitedForm = async () => {
             initialBalance: 5000,
             digitalWallet: [
               /* for development purposes only */
-              { asset_id: 'ETH', balance: 100.108101, color: '#3C9EFF' },
-              { asset_id: 'BTC', balance: 2.1231213, color: '#FFA93C' },
-              { asset_id: 'LTC', balance: 632.1892390, color: '#BDBDBD' }
+              { asset_id: 'ETH', name: 'Ethereum', balance: 100.108101, color: '#3C9EFF' },
+              { asset_id: 'BTC', name: 'Bitcoin', balance: 2.1231213, color: '#FFA93C' },
+              { asset_id: 'LTC', name: 'Litecoin', balance: 632.1892390, color: '#BDBDBD' }
             ]
           }
         }

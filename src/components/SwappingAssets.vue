@@ -2,6 +2,7 @@
 import { ref, inject, computed, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 import { getRandomColor } from '../utils'
+import CubeLoader from './CubeLoader.vue'
 
 const userStore = inject('userStore')
 const APIStore = inject('APIStore')
@@ -47,14 +48,15 @@ const PERCENTAGE_OPTIONS = [
 ]
 
 const handleSubmit = async () => {
-  const { asset_id: fromAssetId, balance: fromAssetBalance } = selectedAsset.value
+  const { asset_id: fromAssetId, balance: fromAssetBalance, name: fromAssetName } = selectedAsset.value
   const toAssetId = destinationAssetId.value
   const fromAssetAmount = parseFloat(amount.value)
-  if (confirm(`Are you sure you want to swap ${fromAssetAmount.toFixed(4)} ${fromAssetId} for the equivalent in ${toAssetId} ?`)) {
+  let fromAssetFullName = `${fromAssetName} (${fromAssetId})`
+  if (confirm(`Are you sure you want to swap ${fromAssetAmount.toFixed(4)} ${fromAssetFullName} for the equivalent in ${toAssetId} ?`)) {
     try {
       loading.value = true
       const [{ price_usd: fromAssetPrice }] = await APIStore.getAssetById(fromAssetId)
-      const [{ price_usd: toAssetPrice }] = await APIStore.getAssetById(toAssetId)
+      const [{ price_usd: toAssetPrice, name: toAssetName }] = await APIStore.getAssetById(toAssetId)
       /* Calcul du montant de l'actif d'arrivée */
       const toAssetAmount = (fromAssetAmount * fromAssetPrice) / toAssetPrice
       /* Calcul de la nouvelle balance */
@@ -68,21 +70,29 @@ const handleSubmit = async () => {
         digitalWallet.push({
           asset_id: toAssetId,
           balance: toAssetAmount,
+          name:  toAssetName,
           color: getRandomColor()
         })
       }
-      /* Update fromAsset balance */
-      digitalWallet.find(a => a.asset_id === fromAssetId).balance = newFromAssetBalance
+      if (newFromAssetBalance > 0) {
+        /* Update fromAsset balance */
+        digitalWallet.find(a => a.asset_id === fromAssetId).balance = newFromAssetBalance
+      } else {
+        /* Remove fromAsset object from digitalWallet */
+        const index = digitalWallet.findIndex(a => a.asset_id === fromAssetId)
+        if (index !== -1) digitalWallet.splice(index, 1)
+        selectedAsset.value = null
+      }
       /* Update digitalWallet */
       userStore.updateDigitalWallet(digitalWallet)
       /* Display alert for user */
-      alert(`You exchanged ${fromAssetAmount.toFixed(4)} ${fromAssetId} for ${toAssetAmount.toFixed(4)} ${toAssetId}. Your new ${fromAssetId} balance is ${newFromAssetBalance.toFixed(4)}.`)
+      alert(`You exchanged ${fromAssetAmount.toFixed(4)} ${fromAssetFullName} for ${toAssetAmount.toFixed(4)} ${toAssetName} (${toAssetId}). Your new ${fromAssetFullName} balance is ${newFromAssetBalance.toFixed(4)}.`)
       /* Reset amount input */
       amount.value = null
     } catch (err) {
       console.error(err)
     } finally {
-      loading.value = true
+      loading.value = false
     }
   }
 }
@@ -94,7 +104,7 @@ const handleClick = (percentage) => {
 
 <template>
   <div>
-    <form class="swap-form" @submit.prevent="handleSubmit">
+    <form v-show="!loading" class="swap-form" @submit.prevent="handleSubmit">
       <div v-if="isSameAsset">
         <p class="error-message">You cannot swap an asset for itself</p>
       </div>
@@ -104,7 +114,7 @@ const handleClick = (percentage) => {
         <option v-for="asset in digitalWallet"
           :key="asset.asset_id"
           :value="asset">
-          {{ asset.asset_id }}
+          {{ `${asset.name} (${asset.asset_id})` }}
         </option>
       </select>
 
@@ -150,6 +160,9 @@ const handleClick = (percentage) => {
         <button class="btn btn-rose" type="reset">Reset</button>
       </div>
     </form>
+    <div v-if="loading" class="my-20">
+      <CubeLoader />
+    </div>
   </div>
 </template>
 
