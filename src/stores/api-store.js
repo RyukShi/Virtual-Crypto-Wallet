@@ -6,6 +6,7 @@ export const useAPIStore = defineStore('api-store', () => {
   const exchanges = ref([])
   const loading = ref(false)
   const selectedAsset = ref(null)
+  const assetIcons = ref(null)
 
   const COINAPI_URI = 'https://rest.coinapi.io/v1'
 
@@ -17,6 +18,18 @@ export const useAPIStore = defineStore('api-store', () => {
     }
   }
 
+  const getAssetIcons = async (size) => {
+    try {
+      if (size === undefined) size = 32
+      const response = await fetch(`${COINAPI_URI}/assets/icons/${size}`, CONFIG)
+      const jsonAssetIcons = await response.json()
+      return jsonAssetIcons
+    } catch (error) {
+      console.error(`Error fetching asset icons: ${error}`)
+      return null
+    }
+  }
+
   const getAssetsFromAPI = () => {
     loading.value = true
     // fetch assets data from API
@@ -25,6 +38,14 @@ export const useAPIStore = defineStore('api-store', () => {
         const assetsJsonData = await response.json()
         assets.value = assetsJsonData
         console.log('Assets lodaded from API')
+      }).then(async () => {
+        if (!assetIcons.value) {
+          const assetIconsJson = await getAssetIcons()
+          if (assetIconsJson) {
+            assetIcons.value = assetIconsJson
+            console.log('Assets icons lodaded from API')
+          }
+        }
       })
       .catch(error => console.error(error))
       .finally(() => loading.value = false)
@@ -57,6 +78,6 @@ export const useAPIStore = defineStore('api-store', () => {
   return {
     assets, exchanges, loading, selectedAsset,
     getAssetsFromAPI, getExchangesFromAPI,
-    getAssetById
+    getAssetById, assetIcons
   }
 })

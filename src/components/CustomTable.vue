@@ -28,7 +28,12 @@ const props = defineProps({
       <tbody>
         <tr v-for="(asset, i) in props.assets" :key="asset.asset_id">
           <td class="custom-cell">{{ i + 1 }}</td>
-          <td class="custom-cell"><strong>{{ asset.name }}</strong> ({{ asset.asset_id }})</td>
+          <td class="custom-cell">
+            <div class="centered gap-x-4">
+              {{ asset.asset_id }}
+              <img v-if="asset.iconUrl" :src="asset.iconUrl" :alt="`${asset.asset_id} icon`" />
+            </div>
+          </td>
           <td class="custom-cell">{{ formatedNumber(asset.price_usd) }}</td>
           <td class="custom-cell">{{ formatedNumber(asset.volume_1day_usd) }}</td>
           <td class="custom-cell">

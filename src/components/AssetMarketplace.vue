@@ -5,14 +5,14 @@ import CubeLoader from './CubeLoader.vue'
 
 const APIStore = inject('APIStore')
 
-onBeforeMount(() => APIStore.getAssetsFromAPI())
+onBeforeMount(async () => await APIStore.getAssetsFromAPI())
 
 const TYPE_OPTIONS = [
   { value: 'all', label: 'All'},
   { value: 1, label: 'Crypto' },
   { value: 0, label: 'Fiat' }
 ]
-const columns = ['#', 'Name', 'Price', 'Day Volume', 'Details']
+const columns = ['#', 'Symbol', 'Price', 'Day Volume', 'Details']
 /* refs */
 const assetInput = ref(null)
 const selectedType = ref(1)
@@ -25,7 +25,11 @@ const getFilteredAsset = computed(() => {
     asset.volume_1day_usd > Math.pow(10, 7) &&
     ((assetInput.value === null) || (asset.name.toLowerCase().includes(assetInput.value.toLowerCase()) ||
     asset.asset_id.toLowerCase() === assetInput.value.toLowerCase()))
-  )
+  ).map(asset => {
+    const icon = APIStore.assetIcons.find(icon => icon.asset_id === asset.asset_id)
+    /* Add iconUrl property into object */
+    return { ...asset, iconUrl: icon ? icon.url : null }
+  })
 })
 </script>
 
