@@ -8,6 +8,12 @@ Cette application est un portefeuille virtuel de crypto-monnaies créé à l'aid
 
 This application is a virtual crypto wallet created using the Vue.js Framework. It allows the user to display the price of crypto assets as well as fiat money. All data in the application comes from the CoinAPI API. In the future, the application will offer the virtual possibility to buy or sell crypto-currencies or fiat currencies, to swap from one asset to another (also called "swapping"), thus offering all the functionalities of a virtual wallet.
 
+## Screenshot
+
+That's home page screenshot.
+
+![Home page screenshot](./src/assets/images/screenshot.png "Home page screenshot")
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
