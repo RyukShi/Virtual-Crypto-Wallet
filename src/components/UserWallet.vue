@@ -3,36 +3,54 @@ import { ref, computed, inject, onBeforeMount } from 'vue'
 import { formatedNumber } from '../utils'
 import { useRouter } from 'vue-router'
 import CustomChart from './CustomChart.vue'
+import CubeLoader from './CubeLoader.vue'
 
 const userStore = inject('userStore')
 const APIStore = inject('APIStore')
 const router = useRouter()
-const data = ref(null)
 
+/* Extract data from userStore */
 const { digitalWallet, initialBalance,
         firstName, lastName } = userStore.user.user_metadata
 const stars = '********'
 
+const data = ref(null)
+/* Boolean refs */
+const loading = ref(false)
+const privateMode = ref(false)
+/* Number refs */
+const walletBalance = ref(0)
+const Accountbalance = ref(initialBalance)
+const profitLoss = ref(100.118)
+
 onBeforeMount(async () => {
   if (digitalWallet) {
-    let assets = await Promise.all(digitalWallet.map(a => APIStore.getAssetById(a.asset_id)))
-    /* flat assets array */
-    assets = assets.flat()
-    data.value = {
-      labels: digitalWallet.map(a => a.asset_id),
-      datasets: [{
-        data: digitalWallet.map(a => a.balance * assets.find(asset => asset.asset_id === a.asset_id).price_usd),
-        backgroundColor: digitalWallet.map(a => a.color),
-        hoverOffset: 4
-      }]
+    try {
+      loading.value = true
+      var userAssets = await Promise.all(digitalWallet.map(a => APIStore.getAssetById(a.asset_id)))
+      /* flat userAssets array */
+      userAssets = userAssets.flat()
+      const AssetPrices = digitalWallet.map(a => a.balance * userAssets.find(asset => asset.asset_id === a.asset_id).price_usd)
+      /* Sum all asset prices */
+      walletBalance.value = AssetPrices.reduce((a, b) => a + b, 0)
+
+      data.value = {
+        labels: digitalWallet.map(a => `${a.name} (${a.asset_id})`),
+        datasets: [{
+          data: AssetPrices,
+          backgroundColor: digitalWallet.map(a => a.color),
+          hoverOffset: 4
+        }]
+      }
+    } catch (error) {
+      console.error(error)
+    } finally {
+      loading.value = false
     }
   }
 })
 
-const Accountbalance = ref(initialBalance)
-const privateMode = ref(false)
-const profitLoss = ref(100.118)
-
+/* Computed refs */
 const fullName = computed(() => {
   return `${firstName} ${lastName}`
 })
@@ -44,6 +62,11 @@ const formatedAccountBalance = computed(() => {
 
 const formatedProfitLoss = computed(() => {
   if (!privateMode.value) return formatedNumber(profitLoss.value)
+  else return stars
+})
+
+const formatedWalletBalance = computed(() => {
+  if (!privateMode.value) return formatedNumber(walletBalance.value)
   else return stars
 })
 
@@ -63,9 +86,13 @@ const signOut = async () => {
 
 <template>
   <div class="my-20">
-    <div class="flex flex-col gap-y-5 items-center">
+    <div v-if="loading" class="centered">
+      <CubeLoader />
+    </div>
+    <div v-else class="flex flex-col gap-y-5 items-center">
       <p class="text-xl">Glad to see you again {{ fullName }}</p>
       <p class="text-3xl font-semibold">{{ formatedAccountBalance }}</p>
+      <p class="text-3xl font-semibold">{{ formatedWalletBalance }}</p>
       <p :class="`text-xl font-semibold ${getColor}`">{{ formatedProfitLoss }}</p>
       <button class="btn btn-sky" @click="privateMode = !privateMode">
         Private mode
