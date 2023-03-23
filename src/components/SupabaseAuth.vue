@@ -72,9 +72,9 @@ const submitedForm = async () => {
           data: {
             firstName: firstName.value,
             lastName: lastName.value,
-            initialBalance: 5000,
             digitalWallet: [
               /* for development purposes only */
+              { asset_id: 'USDC', name: 'USDC', balance: 5000, color: '#3EC5A3' },
               { asset_id: 'ETH', name: 'Ethereum', balance: 100.108101, color: '#3C9EFF' },
               { asset_id: 'BTC', name: 'Bitcoin', balance: 2.1231213, color: '#FFA93C' },
               { asset_id: 'LTC', name: 'Litecoin', balance: 632.1892390, color: '#BDBDBD' }

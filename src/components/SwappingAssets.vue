@@ -15,14 +15,16 @@ const selectedAsset = ref(null)
 const amount = ref(null)
 const destinationAssetId = ref(null)
 const loading = ref(false)
+const selectedAssetType = ref(null)
 
 onBeforeMount(() => {
+  selectedAssetType.value = Number(isCrypto)
   destinationAssetId.value = (assetId !== undefined) ? assetId : null
 })
 
 const getFilteredAsset = computed(() => {
   return APIStore.assets.filter(asset =>
-    asset.type_is_crypto === Number(isCrypto) &&
+    asset.type_is_crypto === selectedAssetType.value &&
     !isNaN(asset.price_usd) && asset.price_usd > 0 &&
     asset.volume_1day_usd > Math.pow(10, 7)
   )
@@ -105,6 +107,17 @@ const handleClick = (percentage) => {
 <template>
   <div>
     <form v-show="!loading" class="swap-form" @submit.prevent="handleSubmit">
+
+      <h3 class="text-sm text-center">Choose the asset type to filter</h3>
+      <div class="centered gap-x-4">
+        <label> Crypto
+          <input type="radio" v-model="selectedAssetType" :value="1" />
+        </label>
+        <label> Fiat
+          <input type="radio" v-model="selectedAssetType" :value="0" />
+        </label>
+      </div>
+
       <div v-if="isSameAsset">
         <p class="error-message">You cannot swap an asset for itself</p>
       </div>

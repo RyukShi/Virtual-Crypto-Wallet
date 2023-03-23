@@ -10,8 +10,7 @@ const APIStore = inject('APIStore')
 const router = useRouter()
 
 /* Extract data from userStore */
-const { digitalWallet, initialBalance,
-        firstName, lastName } = userStore.user.user_metadata
+const { digitalWallet, firstName, lastName } = userStore.user.user_metadata
 const stars = '********'
 
 const data = ref(null)
@@ -20,7 +19,6 @@ const loading = ref(false)
 const privateMode = ref(false)
 /* Number refs */
 const walletBalance = ref(0)
-const Accountbalance = ref(initialBalance)
 const profitLoss = ref(100.118)
 
 onBeforeMount(async () => {
@@ -55,11 +53,6 @@ const fullName = computed(() => {
   return `${firstName} ${lastName}`
 })
 
-const formatedAccountBalance = computed(() => {
-  if (!privateMode.value) return formatedNumber(Accountbalance.value)
-  else return stars
-})
-
 const formatedProfitLoss = computed(() => {
   if (!privateMode.value) return formatedNumber(profitLoss.value)
   else return stars
@@ -91,7 +84,6 @@ const signOut = async () => {
     </div>
     <div v-else class="flex flex-col gap-y-5 items-center">
       <p class="text-xl">Glad to see you again {{ fullName }}</p>
-      <p class="text-3xl font-semibold">{{ formatedAccountBalance }}</p>
       <p class="text-3xl font-semibold">{{ formatedWalletBalance }}</p>
       <p :class="`text-xl font-semibold ${getColor}`">{{ formatedProfitLoss }}</p>
       <button class="btn btn-sky" @click="privateMode = !privateMode">
