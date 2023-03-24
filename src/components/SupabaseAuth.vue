@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, watch, inject } from 'vue'
-import { supabase } from '../supabase'
 import { useRouter } from 'vue-router'
 import isEmail from 'validator/lib/isEmail'
 import { isSecurePassword } from '../utils'
@@ -64,49 +63,14 @@ watch([isValidEmail, isSameEmail, isSamePassword, isValidPassword], (values) => 
 })
 
 const submitedForm = async () => {
+  const data = { password: password.value, email: email.value }
   if (signUpMode.value) {
-    try {
-      const { error } = await supabase.auth.signUp(
-        { email: email.value, password: password.value },
-        {
-          data: {
-            firstName: firstName.value,
-            lastName: lastName.value,
-            digitalWallet: [
-              /* for development purposes only */
-              { asset_id: 'USDC', name: 'USDC', balance: 5000, color: '#3EC5A3' },
-              { asset_id: 'ETH', name: 'Ethereum', balance: 100.108101, color: '#3C9EFF' },
-              { asset_id: 'BTC', name: 'Bitcoin', balance: 2.1231213, color: '#FFA93C' },
-              { asset_id: 'LTC', name: 'Litecoin', balance: 632.1892390, color: '#BDBDBD' }
-            ]
-          }
-        }
-      )
-
-      if (error) throw error
-
-      alert('Check your email to confirm your registration !')
-      router.push({ name: 'marketplace' })
-
-    } catch (error) {
-      alert(error.error_description || error.message)
-    }
-  } else {
-    try {
-      const { user, error } = await supabase.auth.signIn(
-        { email: email.value, password: password.value })
-
-      if (error) throw error
-
-      userStore.user = user
-      userStore.isAuthenticated = true
-
-      // redirect to my-wallet page
-      router.push({ name: 'my-wallet' })
-
-    } catch (error) {
-      alert(error.error_description || error.message)
-    }
+    data.email = email.value
+    data.password = password.value
+  }
+  const success = await userStore.authentication(signUpMode.value, data)
+  if (success) {
+    (signUpMode.value) ? router.push({ name: 'marketplace' }) : router.push({ name: 'my-wallet' })
   }
 }
 </script>
