@@ -4,13 +4,18 @@ import { formatedNumber } from '../utils'
 import { useRouter } from 'vue-router'
 import CustomChart from './CustomChart.vue'
 import CubeLoader from './CubeLoader.vue'
+import UserTransactions from './UserTransactions.vue'
 
 const userStore = inject('userStore')
 const APIStore = inject('APIStore')
 const router = useRouter()
 
 /* Extract data from userStore */
-const { digitalWallet, firstName, lastName } = userStore.user.user_metadata
+const {
+  digitalWallet,
+  firstName,
+  lastName,
+  transactions } = userStore.user.user_metadata
 const stars = '********'
 
 const data = ref(null)
@@ -94,5 +99,7 @@ const signOut = async () => {
 
     <CustomChart v-if="!privateMode && data" type="doughnut" :data="data"
       title="Allocation" />
+
+    <UserTransactions :transactions="transactions" />
   </div>
 </template>

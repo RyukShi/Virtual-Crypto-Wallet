@@ -117,9 +117,21 @@ export const useUserStore = defineStore('user-store', () => {
     }
   }
 
+  const updateTransactions = async (newTransactions) => {
+    try {
+      const { error } = await supabase.auth.update({
+        data: { transactions: newTransactions }
+      })
+      if (error) throw error
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return {
     user, isAuthenticated, logout,
     sendRecoveryPasswordLink, updatePassword,
-    updateDigitalWallet, authentication
+    updateDigitalWallet, authentication,
+    updateTransactions
   }
 })

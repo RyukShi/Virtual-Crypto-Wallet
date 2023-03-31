@@ -9,7 +9,7 @@ const APIStore = inject('APIStore')
 const route = useRoute()
 
 const { isCrypto, assetId } = route.query
-const { digitalWallet } = userStore.user.user_metadata
+const { digitalWallet, transactions } = userStore.user.user_metadata
 
 const selectedAsset = ref(null)
 const amount = ref(null)
@@ -86,7 +86,17 @@ const handleSubmit = async () => {
         selectedAsset.value = null
       }
       /* Update digitalWallet */
-      userStore.updateDigitalWallet(digitalWallet)
+      await userStore.updateDigitalWallet(digitalWallet)
+      /* Update transactions */
+      transactions.push({
+        date: new Date(),
+        type: 'swap',
+        from_asset_id: fromAssetId,
+        to_asset_id: toAssetId,
+        from_asset_amount: fromAssetAmount,
+        to_asset_amount: toAssetAmount
+      })
+      await userStore.updateTransactions(transactions)
       /* Display alert for user */
       alert(`You exchanged ${fromAssetAmount.toFixed(4)} ${fromAssetFullName} for ${toAssetAmount.toFixed(4)} ${toAssetName} (${toAssetId}). Your new ${fromAssetFullName} balance is ${newFromAssetBalance.toFixed(4)}.`)
       /* Reset amount input */
