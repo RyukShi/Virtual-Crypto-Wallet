@@ -89,7 +89,7 @@ const handleSubmit = async () => {
       await userStore.updateDigitalWallet(digitalWallet)
       /* Update transactions */
       transactions.push({
-        date: new Date(),
+        date: new Date().toLocaleString(),
         type: 'swap',
         from_asset_id: fromAssetId,
         to_asset_id: toAssetId,
