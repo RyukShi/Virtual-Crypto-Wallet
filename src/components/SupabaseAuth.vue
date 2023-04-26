@@ -67,6 +67,8 @@ const submitedForm = async () => {
   if (signUpMode.value) {
     data.email = email.value
     data.password = password.value
+    data.firstName = firstName.value
+    data.lastName = lastName.value
   }
   const success = await userStore.authentication(signUpMode.value, data)
   if (success) {
