@@ -1,9 +1,8 @@
-export const formatedNumber = (n, digits) => {
-  if (digits === undefined) digits = 2;
+export const formatedNumber = (n: number, digits: number = 2) => {
   return '$ ' + n.toLocaleString("en-US", { maximumFractionDigits: digits });
 }
 
-export const isSecurePassword = (password) => {
+export const isSecurePassword = (password: string) => {
   if (password.length < 8)
     return [false, 'The password must be at least 8 characters long'];
   if (!/\d/.test(password))
