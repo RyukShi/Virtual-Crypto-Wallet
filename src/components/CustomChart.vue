@@ -1,26 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Chart from 'chart.js/auto'
+import Chart, { type ChartType, type ChartData } from 'chart.js/auto'
 
-const props = defineProps({
-  type: {
-    type: String,
-    required: true
-  },
-  data: {
-    type: Object,
-    required: true
-  },
-  title: {
-    type: String,
-    required: true
-  }
-})
+export type CustomChartProps = {
+  type: ChartType;
+  data: ChartData;
+  title: string;
+}
 
-const customChart = ref(null)
+const props = defineProps<CustomChartProps>()
+
+const customChart = ref<HTMLCanvasElement>()
 
 onMounted(() => {
-  const ctx = customChart.value.getContext('2d')
+  const ctx = customChart.value?.getContext('2d')
+  if (!ctx) return
   new Chart(ctx, {
     type: props.type,
     data: props.data,
