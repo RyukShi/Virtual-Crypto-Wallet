@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onBeforeMount, inject } from 'vue'
 import CustomTable from './CustomTable.vue'
 import CubeLoader from './CubeLoader.vue'
@@ -14,7 +14,7 @@ const TYPE_OPTIONS = [
 ]
 const columns = ['#', 'Symbol', 'Price', 'Day Volume', 'Details']
 /* refs */
-const assetInput = ref(null)
+const assetInput = ref()
 const selectedType = ref(1)
 
 const getFilteredAsset = computed(() => {
