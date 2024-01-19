@@ -1,20 +1,23 @@
-<script setup>
+<script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { formatedNumber } from '../utils'
 import { inject } from 'vue'
 
 const APIStore = inject('APIStore')
 
-const props = defineProps({
-  columns: {
-    type: Array,
-    required: true
-  },
-  assets: {
-    type: Array,
-    required: true
-  }
-})
+type Asset = {
+  asset_id: string;
+  iconUrl: string;
+  price_usd: number;
+  volume_1day_usd: number;
+}
+
+export type CustomTableProps = {
+  columns: string[];
+  assets: Asset[];
+}
+
+const props = defineProps<CustomTableProps>()
 </script>
 
 <template>
