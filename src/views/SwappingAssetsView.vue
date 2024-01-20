@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import SwappingAssets from '../components/SwappingAssets.vue'
 </script>
 

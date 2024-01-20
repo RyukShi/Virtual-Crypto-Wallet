@@ -1,4 +1,4 @@
-export const formatedNumber = (n: number, digits: number = 2) => {
+export const formattedNumber = (n: number, digits: number = 2) => {
   return '$ ' + n.toLocaleString("en-US", { maximumFractionDigits: digits });
 }
 

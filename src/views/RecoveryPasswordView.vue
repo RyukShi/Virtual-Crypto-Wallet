@@ -1,11 +1,11 @@
-<script setup>
-import { ref, inject, computed } from 'vue'
+<script setup lang="ts">
+import { ref, computed } from 'vue'
 import { isSecurePassword } from '../utils'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const userStore = inject('userStore')
+const userStore = useUserStore()
 const newPassword = ref('')
 const confirmNewPassword = ref('')
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import SupabaseAuth from '../components/SupabaseAuth.vue'
 </script>
 

@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { formatedNumber } from '../utils'
-import { inject } from 'vue'
-
-const APIStore = inject('APIStore')
-
-type Asset = {
-  asset_id: string;
-  iconUrl: string;
-  price_usd: number;
-  volume_1day_usd: number;
-}
+import { type Asset } from '@/stores/api-store'
 
 export type CustomTableProps = {
   columns: string[];
@@ -40,8 +31,7 @@ const props = defineProps<CustomTableProps>()
           <td class="custom-cell">{{ formatedNumber(asset.price_usd) }}</td>
           <td class="custom-cell">{{ formatedNumber(asset.volume_1day_usd) }}</td>
           <td class="custom-cell">
-            <RouterLink :to="{ name: 'asset-details' }" role="button" class="btn btn-sky"
-            @click="APIStore.selectedAsset = asset">
+            <RouterLink :to="{ name: 'asset-details', params: { id: asset.asset_id } }" role="button" class="btn btn-sky">
               View
             </RouterLink>
           </td>

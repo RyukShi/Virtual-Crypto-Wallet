@@ -1,8 +1,9 @@
-<script setup>
-import { ref, computed, watch, inject } from 'vue'
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import isEmail from 'validator/lib/isEmail'
 import { isSecurePassword } from '../utils'
+import { useUserStore } from '@/stores/user-store'
 
 const email = ref('')
 const confirmEmail = ref('')
@@ -20,7 +21,7 @@ const errorMessages = {
   confirmPassword: null,
 }
 
-const userStore = inject('userStore')
+const userStore = useUserStore()
 const router = useRouter()
 
 const isSameEmail = computed(() => email.value === confirmEmail.value)
@@ -62,7 +63,7 @@ watch([isValidEmail, isSameEmail, isSamePassword, isValidPassword], (values) => 
   else errorMessages.password = null
 })
 
-const submitedForm = async () => {
+const submittedForm = async () => {
   const data = { password: password.value, email: email.value }
   if (signUpMode.value) {
     data.email = email.value
@@ -80,7 +81,7 @@ const submitedForm = async () => {
 <template>
   <div class="centered">
     <!-- disabled reloading -->
-    <form class="auth-form" @submit.prevent="submitedForm">
+    <form class="auth-form" @submit.prevent="submittedForm">
       <div>
         <input type="email" v-model="email" required placeholder="Your e-mail" />
         <p v-if="errorMessages.email" class="error-message">{{ errorMessages.email }}</p>

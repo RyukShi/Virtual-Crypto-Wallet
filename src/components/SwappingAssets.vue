@@ -1,25 +1,27 @@
-<script setup>
-import { ref, inject, computed, onBeforeMount } from 'vue'
+<script setup lang="ts">
+import { ref, computed, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 import { getRandomColor } from '../utils'
 import CubeLoader from './CubeLoader.vue'
+import { useUserStore } from '@/stores/user-store'
+import { useAPIStore } from '@/stores/api-store'
 
-const userStore = inject('userStore')
-const APIStore = inject('APIStore')
+const userStore = useUserStore()
+const APIStore = useAPIStore()
 const route = useRoute()
 
-const { isCrypto, assetId } = route.query
+const { assetId } = route.params
 const { digitalWallet, transactions } = userStore.user.user_metadata
 
-const selectedAsset = ref(null)
-const amount = ref(null)
-const destinationAssetId = ref(null)
+const selectedAsset = ref<number>()
+const amount = ref<number>()
+const destinationAssetId = ref<string>()
 const loading = ref(false)
-const selectedAssetType = ref(null)
+const selectedAssetType = ref()
 
 onBeforeMount(() => {
-  selectedAssetType.value = Number(isCrypto)
-  destinationAssetId.value = (assetId !== undefined) ? assetId : null
+  selectedAssetType.value = Number.parseInt(isCrypto)
+  destinationAssetId.value = (assetId !== undefined) ? assetId : ''
 })
 
 const getFilteredAsset = computed(() => {
@@ -83,7 +85,7 @@ const handleSubmit = async () => {
         /* Remove fromAsset object from digitalWallet */
         const index = digitalWallet.findIndex(a => a.asset_id === fromAssetId)
         if (index !== -1) digitalWallet.splice(index, 1)
-        selectedAsset.value = null
+        selectedAsset.value = undefined
       }
       /* Update digitalWallet */
       await userStore.updateDigitalWallet(digitalWallet)
@@ -100,7 +102,7 @@ const handleSubmit = async () => {
       /* Display alert for user */
       alert(`You exchanged ${fromAssetAmount.toFixed(4)} ${fromAssetFullName} for ${toAssetAmount.toFixed(4)} ${toAssetName} (${toAssetId}). Your new ${fromAssetFullName} balance is ${newFromAssetBalance.toFixed(4)}.`)
       /* Reset amount input */
-      amount.value = null
+      amount.value = undefined
     } catch (err) {
       console.error(err)
     } finally {

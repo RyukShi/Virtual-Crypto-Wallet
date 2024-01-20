@@ -1,13 +1,15 @@
-<script setup>
-import { ref, computed, inject, onBeforeMount } from 'vue'
+<script setup lang="ts">
+import { ref, computed, onBeforeMount } from 'vue'
 import { formatedNumber } from '../utils'
 import { useRouter } from 'vue-router'
 import CustomChart from './CustomChart.vue'
 import CubeLoader from './CubeLoader.vue'
 import UserTransactions from './UserTransactions.vue'
+import { useUserStore } from '@/stores/user-store'
+import { useAPIStore } from '@/stores/api-store'
 
-const userStore = inject('userStore')
-const APIStore = inject('APIStore')
+const userStore = useUserStore()
+const APIStore = useAPIStore()
 const router = useRouter()
 
 /* Extract data from userStore */

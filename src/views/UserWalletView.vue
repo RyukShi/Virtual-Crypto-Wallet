@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import UserWallet from '../components/UserWallet.vue'
 </script>
 

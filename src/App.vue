@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { inject } from 'vue'
+import { useUserStore } from '@/stores/user-store'
 
-const userStore = inject('userStore')
+const userStore = useUserStore()
 </script>
 
 <template>

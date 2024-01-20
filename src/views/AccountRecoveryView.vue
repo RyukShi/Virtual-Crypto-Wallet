@@ -1,12 +1,12 @@
-<script setup>
-import { ref, inject, computed } from 'vue'
+<script setup lang="ts">
+import { ref, computed } from 'vue'
 import isEmail from 'validator/lib/isEmail'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const emailRecovery = ref('')
-const userStore = inject('userStore')
+const userStore = useUserStore()
 
 const isValidEmail = computed(() => isEmail(emailRecovery.value))
 

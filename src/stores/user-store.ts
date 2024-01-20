@@ -4,7 +4,7 @@ import { supabase } from '../supabase'
 import { useAPIStore } from './api-store'
 
 export const useUserStore = defineStore('user-store', () => {
-  const user = ref(null)
+  const user = ref()
   const isAuthenticated = ref(false)
 
   const authentication = async (signUpMode, data) => {
