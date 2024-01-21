@@ -1,16 +1,19 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
+type PeriodsVolume = {
+  volume_1hrs_usd: number;
+  volume_1day_usd: number;
+  volume_1mth_usd: number;
+}
+
 export type Asset = {
   name: string;
   type_is_crypto: 0 | 1;
   asset_id: string;
   iconUrl: string | null;
   price_usd: number;
-  volume_1hrs_usd: number;
-  volume_1day_usd: number;
-  volume_1mth_usd: number;
-}
+} & PeriodsVolume
 
 type Icon = {
   asset_id: string;
@@ -18,8 +21,10 @@ type Icon = {
 }
 
 type Exchange = {
-
-}
+  name: string;
+  exchange_id: string;
+  website: string;
+} & PeriodsVolume
 
 export const useAPIStore = defineStore('api-store', () => {
   const assets = ref<Asset[]>([])
@@ -29,7 +34,8 @@ export const useAPIStore = defineStore('api-store', () => {
   const lastUpdate = ref<Date>()
 
   const COINAPI_URI = 'https://rest.coinapi.io/v1'
-  const SECONDS_TO_MILLISECONDS = 1000
+  /* The time interval before allowing an update. (60 seconds)  */
+  const UPDATE_INTERVAL = 60000
 
   const CONFIG = {
     method: "GET",
@@ -43,27 +49,25 @@ export const useAPIStore = defineStore('api-store', () => {
     try {
       const res = await fetch(`${COINAPI_URI}/assets/icons/${size}`, CONFIG)
       const jsonAssetIcons = await res.json()
-      return jsonAssetIcons
+      return jsonAssetIcons as Icon[]
     } catch (error) {
       console.error(`Error fetching asset icons: ${error}`)
       return null
     }
   }
 
+  const shouldPerformUpdate = (): boolean => {
+    if (!lastUpdate.value) return true
+    const currentDate = new Date()
+    const elapsedTime = currentDate.getTime() - lastUpdate.value.getTime()
+    return (elapsedTime > UPDATE_INTERVAL)
+  }
+
   /**
    * This function fetches assets data from CoinAPI.
-   * @param {number} updateIntervalSeconds - The time interval (in seconds) before allowing an update.
    */
-  const getAssetsFromAPI = async (updateIntervalSeconds: number = 60) => {
-    let isUpdateAllowed = true /* Allow update by default */
-
-    if (lastUpdate.value) {
-      const currentDate = new Date()
-      const elapsedTime = currentDate.getTime() - lastUpdate.value.getTime()
-      isUpdateAllowed = elapsedTime > updateIntervalSeconds * SECONDS_TO_MILLISECONDS
-    }
-
-    if (isUpdateAllowed) {
+  const getAssetsFromAPI = async () => {
+    if (shouldPerformUpdate()) {
       try {
         loading.value = true
         const res = await fetch(`${COINAPI_URI}/assets`, CONFIG)
@@ -74,8 +78,9 @@ export const useAPIStore = defineStore('api-store', () => {
           lastUpdate.value = new Date()
         }
 
-        if (!assetIcons.value) {
+        if (assetIcons.value.length === 0) {
           const assetIconsJson = await getAssetIcons()
+          console.log(assetIconsJson)
           if (assetIconsJson)
             assetIcons.value = assetIconsJson
         }
@@ -104,13 +109,20 @@ export const useAPIStore = defineStore('api-store', () => {
   }
 
   const getAssetById = async (assetId: string) => {
-    try {
-      const res = await fetch(`${COINAPI_URI}/assets/${assetId}`, CONFIG)
-      const jsonAsset = await res.json()
-      return jsonAsset[0]
-    } catch (error) {
-      console.error(`Error fetching asset ${assetId}: ${error}`)
-      return null
+    if (shouldPerformUpdate()) {
+      try {
+        loading.value = true
+        const res = await fetch(`${COINAPI_URI}/assets/${assetId}`, CONFIG)
+        const jsonAsset = await res.json()
+        return jsonAsset[0] as Asset
+      } catch (error) {
+        console.error(`Error fetching asset ${assetId}: ${error}`)
+        return null
+      } finally {
+        loading.value = false
+      }
+    } else {
+      return assets.value.find(asset => asset.asset_id === assetId)
     }
   }
 

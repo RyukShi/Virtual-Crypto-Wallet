@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { formatedNumber } from '../utils'
+import { formattedNumber } from '../utils'
 import { type Asset } from '@/stores/api-store'
 
 export type CustomTableProps = {
@@ -28,10 +28,10 @@ const props = defineProps<CustomTableProps>()
               <img v-if="asset.iconUrl" :src="asset.iconUrl" :alt="`${asset.asset_id} icon`" />
             </div>
           </td>
-          <td class="custom-cell">{{ formatedNumber(asset.price_usd) }}</td>
-          <td class="custom-cell">{{ formatedNumber(asset.volume_1day_usd) }}</td>
+          <td class="custom-cell">{{ formattedNumber(asset.price_usd) }}</td>
+          <td class="custom-cell">{{ formattedNumber(asset.volume_1day_usd) }}</td>
           <td class="custom-cell">
-            <RouterLink :to="{ name: 'asset-details', params: { id: asset.asset_id } }" role="button" class="btn btn-sky">
+            <RouterLink :to="{ name: 'asset-details', params: { assetId: asset.asset_id } }" role="button" class="btn btn-sky">
               View
             </RouterLink>
           </td>

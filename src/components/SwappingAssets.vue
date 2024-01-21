@@ -13,7 +13,7 @@ const route = useRoute()
 const { assetId } = route.params
 const { digitalWallet, transactions } = userStore.user.user_metadata
 
-const selectedAsset = ref<number>()
+const selectedAsset = ref()
 const amount = ref<number>()
 const destinationAssetId = ref<string>()
 const loading = ref(false)
@@ -34,14 +34,14 @@ const getFilteredAsset = computed(() => {
 const isNotCompleteForm = computed(() =>
   !selectedAsset.value || !amount.value || !destinationAssetId.value
 )
-const isNotValidNumber = computed(() => amount.value && isNaN(amount.value))
+const isNotValidNumber = computed(() => !!amount.value && isNaN(amount.value))
 const isNotValidAmount = computed(() => {
   if (amount.value && selectedAsset.value)
     return parseFloat(amount.value) > selectedAsset.value.balance
   else return false
 })
 const isSameAsset = computed(() => {
-  return selectedAsset.value && destinationAssetId.value &&
+  return !!selectedAsset.value && !!destinationAssetId.value &&
     selectedAsset.value.asset_id === destinationAssetId.value
 })
 
@@ -111,7 +111,7 @@ const handleSubmit = async () => {
   }
 }
 
-const handleClick = (percentage) => {
+const handleClick = (percentage: number) => {
   amount.value = selectedAsset.value.balance * percentage
 }
 </script>

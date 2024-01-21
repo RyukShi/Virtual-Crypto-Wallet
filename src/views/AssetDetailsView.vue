@@ -3,6 +3,7 @@ import { onBeforeMount, ref } from 'vue';
 import { formattedNumber } from '../utils'
 import { useAPIStore, type Asset } from '@/stores/api-store'
 import { useRoute } from 'vue-router'
+import CubeLoader from '@/components/CubeLoader.vue'
 
 const APIStore = useAPIStore()
 const route = useRoute()
@@ -17,7 +18,10 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div v-if="asset">
+  <div v-if="APIStore.loading" class="centered my-20">
+    <CubeLoader />
+  </div>
+  <div v-else-if="asset">
     <h2 class="sub-title">* {{ asset.name }} ({{ asset.asset_id }}) *</h2>
     <p>Current price : {{ formattedNumber(asset.price_usd) }}</p>
     <p>Volume 1 hour : {{ formattedNumber(asset.volume_1hrs_usd) }}</p>

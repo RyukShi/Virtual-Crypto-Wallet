@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onBeforeMount } from 'vue'
-import { formatedNumber } from '../utils'
+import { formattedNumber } from '../utils'
 import { useRouter } from 'vue-router'
 import CustomChart from './CustomChart.vue'
 import CubeLoader from './CubeLoader.vue'
@@ -60,13 +60,13 @@ const fullName = computed(() => {
   return `${firstName} ${lastName}`
 })
 
-const formatedProfitLoss = computed(() => {
-  if (!privateMode.value) return formatedNumber(profitLoss.value)
+const formattedProfitLoss = computed(() => {
+  if (!privateMode.value) return formattedNumber(profitLoss.value)
   else return stars
 })
 
-const formatedWalletBalance = computed(() => {
-  if (!privateMode.value) return formatedNumber(walletBalance.value)
+const formattedWalletBalance = computed(() => {
+  if (!privateMode.value) return formattedNumber(walletBalance.value)
   else return stars
 })
 
@@ -91,8 +91,8 @@ const signOut = async () => {
     </div>
     <div v-else class="flex flex-col gap-y-5 items-center">
       <p class="text-xl">Glad to see you again {{ fullName }}</p>
-      <p class="text-3xl font-semibold">{{ formatedWalletBalance }}</p>
-      <p :class="`text-xl font-semibold ${getColor}`">{{ formatedProfitLoss }}</p>
+      <p class="text-3xl font-semibold">{{ formattedWalletBalance }}</p>
+      <p :class="`text-xl font-semibold ${getColor}`">{{ formattedProfitLoss }}</p>
       <button class="btn btn-sky" @click="privateMode = !privateMode">
         Private mode
       </button>

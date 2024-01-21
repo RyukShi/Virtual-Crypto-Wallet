@@ -1,32 +1,39 @@
 <script setup lang="ts">
-defineProps({
-  transactions: {
-    type: Array,
-    required: true
-  }
-})
+
+type Transaction = {
+  date: string;
+  type: string;
+  from_asset_amount: number;
+  to_asset_amount: number;
+  to_asset_id: string;
+  from_asset_id: string;
+}
+
+export type UserTransactionProps = {
+  transactions: Transaction[]
+}
+
+defineProps<UserTransactionProps>()
 </script>
 
 <template>
-  <div>
-    <div v-if="transactions.length > 0">
-      <h2 class="sub-title text-center">
-        Your transactions
-      </h2>
-      <div class="flex flex-col gap-y-5 items-center justify-center">
-        <div v-for="t in transactions" class="transaction" :key="t.date">
-          <h3>{{ `${t.type} ${t.date}` }}</h3>
-          <p>{{ `From asset : ${t.from_asset_amount} ${t.from_asset_id}` }}</p>
-          <p>{{ `To asset : ${t.to_asset_amount} ${t.to_asset_id}` }}</p>
-        </div>
+  <div v-if="transactions.length > 0">
+    <h2 class="sub-title text-center">
+      Your transactions
+    </h2>
+    <div class="flex flex-col gap-y-5 items-center justify-center">
+      <div v-for="t in transactions" class="transaction" :key="t.date">
+        <h3>{{ `${t.type} ${t.date}` }}</h3>
+        <p>{{ `From asset : ${t.from_asset_amount} ${t.from_asset_id}` }}</p>
+        <p>{{ `To asset : ${t.to_asset_amount} ${t.to_asset_id}` }}</p>
       </div>
     </div>
-    <div v-else>
-      <h2 class="sub-title text-center">
-        No transactions, you can buy many assets 
-        <RouterLink to="/swapping">here</RouterLink>
-      </h2>
-    </div>
+  </div>
+  <div v-else>
+    <h2 class="sub-title text-center">
+      No transactions, you can buy many assets
+      <RouterLink to="/swapping">here</RouterLink>
+    </h2>
   </div>
 </template>
 

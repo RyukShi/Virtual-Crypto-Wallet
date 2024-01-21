@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import AssetDetailsView from '../views/AssetDetailsView.vue'
 import MarketplaceView from '../views/MarketplaceView.vue'
@@ -6,7 +6,7 @@ import UserWalletView from '../views/UserWalletView.vue'
 import SwappingAssetsView from '../views/SwappingAssetsView.vue'
 import { useUserStore } from '../stores/user-store'
 
-const isAuthenticatedFully = (to, _from, next) => {
+const isAuthenticatedFully = (to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
   const userStore = useUserStore()
   if (to.name !== 'login' && !userStore.isAuthenticated) next({ name: 'login' })
   else next()
