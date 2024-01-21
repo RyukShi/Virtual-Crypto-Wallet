@@ -3,28 +3,39 @@ import { defineStore } from 'pinia'
 import { supabase } from '../supabase'
 import { useAPIStore } from './api-store'
 
+type UserAuthenticationData = {
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 export const useUserStore = defineStore('user-store', () => {
   const user = ref()
   const isAuthenticated = ref(false)
 
-  const authentication = async (signUpMode, data) => {
+  const DEFAULT_REGISTRATION_ASSETS = [
+    { asset_id: 'ETH', color: '#3C9EFF', amount_usd: 250 },
+    { asset_id: 'BTC', color: '#FFA93C', amount_usd: 250 },
+    { asset_id: 'USDC', color: '#3EC5A3', amount_usd: 1000 }
+  ]
+
+  const authentication = async (signUpMode: boolean, data: UserAuthenticationData) => {
     const APIStore = useAPIStore()
     if (signUpMode) {
-      const defaultRegistrationtAssets = [
-        { asset_id: 'ETH', color: '#3C9EFF', amount_usd: 250  },
-        { asset_id: 'BTC', color: '#FFA93C', amount_usd: 250 },
-        { asset_id: 'USDC', color: '#3EC5A3', amount_usd: 1000 }
-      ]
       try {
         const userAssets = await Promise.all(
-          defaultRegistrationtAssets
+          DEFAULT_REGISTRATION_ASSETS
             .map(async (asset) => {
-              let updateAsset = await APIStore.getAssetById(asset.asset_id)
-              let b = asset.amount_usd / updateAsset[0].price_usd
+              const updateAsset = await APIStore.getAssetById(asset.asset_id)
+              if (!updateAsset) {
+                return
+              }
+              const b = asset.amount_usd / updateAsset.price_usd
               delete asset.amount_usd
               return {
                 ...asset,
-                name: updateAsset[0].name,
+                name: updateAsset.name,
                 balance: b
               }
             })
@@ -42,7 +53,7 @@ export const useUserStore = defineStore('user-store', () => {
         )
 
         if (error) throw error
-  
+
         alert('Check your email to confirm your registration !')
         return true
       } catch (error) {
@@ -79,7 +90,7 @@ export const useUserStore = defineStore('user-store', () => {
     }
   }
 
-  const sendRecoveryPasswordLink = async (email) => {
+  const sendRecoveryPasswordLink = async (email: string) => {
     try {
       const { error } = await supabase.auth.api.resetPasswordForEmail(email, {
         redirectTo: "http://localhost:5173/recovery-password"
@@ -94,7 +105,7 @@ export const useUserStore = defineStore('user-store', () => {
     }
   }
 
-  const updatePassword = async (password) => {
+  const updatePassword = async (password: string) => {
     try {
       const { user, error } = await supabase.auth.update({ password: password })
       if (error) throw error

@@ -52,7 +52,6 @@ export const useAPIStore = defineStore('api-store', () => {
       return jsonAssetIcons as Icon[]
     } catch (error) {
       console.error(`Error fetching asset icons: ${error}`)
-      return null
     }
   }
 
@@ -117,7 +116,6 @@ export const useAPIStore = defineStore('api-store', () => {
         return jsonAsset[0] as Asset
       } catch (error) {
         console.error(`Error fetching asset ${assetId}: ${error}`)
-        return null
       } finally {
         loading.value = false
       }
