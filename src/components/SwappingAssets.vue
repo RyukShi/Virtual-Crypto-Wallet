@@ -23,7 +23,7 @@ onBeforeMount(() => {
   let { assetId, assetType } = route.query
   destinationAssetId.value = (assetId !== undefined) ? assetId as string : ''
 
-  selectedAssetType.value = Number(assetType)
+  selectedAssetType.value = Number.parseInt(assetType as string)
 
   if (userStore.user?.user_metadata) {
     digitalWallet.value = userStore.user.user_metadata.digitalWallet
@@ -58,17 +58,23 @@ const PERCENTAGE_OPTIONS = [
   { value: 1, label: 'All' }
 ]
 
+const confirmSwapping = (fromAssetFullName: string, toAssetId: string) => {
+  return confirm(
+    `Are you sure you want to swap ${fromAssetAmount.value?.toFixed(4)} ${fromAssetFullName} 
+    for the equivalent in ${toAssetId} ?`)
+}
+
 const handleSubmit = async () => {
-  const fromAssetId = selectedAsset.value?.asset_id
-  const fromAssetBalance = selectedAsset.value?.balance
-  const fromAssetName = selectedAsset.value?.name
+  if (!selectedAsset.value || !destinationAssetId.value || !fromAssetAmount.value) return
+
+  const fromAssetId = selectedAsset.value.asset_id
+  const fromAssetBalance = selectedAsset.value.balance
+  const fromAssetName = selectedAsset.value.name
   const toAssetId = destinationAssetId.value
 
-  /* TODO handle this error */
-  if (!fromAssetId || !fromAssetBalance || !fromAssetName || !toAssetId || !fromAssetAmount.value || !toAssetId) return
-
   let fromAssetFullName = `${fromAssetName} (${fromAssetId})`
-  if (confirm(`Are you sure you want to swap ${fromAssetAmount.value.toFixed(4)} ${fromAssetFullName} for the equivalent in ${toAssetId} ?`)) {
+
+  if (confirmSwapping(fromAssetFullName, toAssetId)) {
     try {
       loading.value = true
       const fromAsset = await APIStore.getAssetById(fromAssetId, true)
