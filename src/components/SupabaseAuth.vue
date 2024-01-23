@@ -15,7 +15,8 @@ const signUpMode = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
 
-const toggleButtonLabel = computed(() => (signUpMode.value) ? 'You have already an account ?' : 'Register now !')
+const toggleModeButtonLabel = computed(() => (signUpMode.value) ? 'You have already an account ?' : 'Register now !')
+const submitButtonLabel = computed(() => (signUpMode.value) ? 'Sign up' : 'Sign in')
 
 const submittedForm = async () => {
   const data: UserAuthenticationData = { password: password.value, email: email.value }
@@ -53,9 +54,9 @@ const submittedForm = async () => {
         <input type="password" v-model="confirmPassword" required placeholder="Confirm your password" />
       </div>
       <div class="flex flex-col items-center gap-y-10">
-        <button class="btn btn-sky" type="submit">{{ (signUpMode) ? 'Sign up' : 'Sign in' }}</button>
+        <button class="btn btn-sky" type="submit">{{ submitButtonLabel }}</button>
         <button class="btn btn-sky" type="button" @click="signUpMode = !signUpMode">
-          {{ toggleButtonLabel }}
+          {{ toggleModeButtonLabel }}
         </button>
         <RouterLink v-if="!signUpMode" to="/account-recovery">Forgot password ?</RouterLink>
       </div>
