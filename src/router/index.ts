@@ -74,7 +74,7 @@ const router = createRouter({
       component: () => import('../views/NotFoundView.vue')
     },
     {
-      path: '/swapping/:assetId',
+      path: '/swapping',
       name: 'swapping',
       component: SwappingAssetsView,
       beforeEnter: [isAuthenticatedFully]

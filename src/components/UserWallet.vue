@@ -12,11 +12,11 @@ const userStore = useUserStore()
 const APIStore = useAPIStore()
 const router = useRouter()
 
-const { firstName, lastName } = userStore.user.user_metadata
 const stars = '********'
 
 const data = ref()
-const transactions = ref<Transaction[]>([])
+const userTransactions = ref<Transaction[]>([])
+const fullName = ref()
 /* Boolean refs */
 const loading = ref(false)
 const privateMode = ref(false)
@@ -38,20 +38,26 @@ const computeAssetsPrices = async (digitalWallet: DigitalWallet) => {
 
   const sum = assetPrices.reduce((a, b) => {
     if (!!a && !!b) return a + b
-  }, 0)
+  })
 
   return { sum, assetPrices }
 }
 
 onBeforeMount(async () => {
-  const { transactions, digitalWallet } = userStore.user.user_metadata
-  transactions.value = transactions
+  if (!userStore.user) {
+    router.push({ name: 'marketplace' })
+    return
+  }
+  const { firstName, lastName, transactions, digitalWallet } = userStore.user.user_metadata
+  userTransactions.value = transactions as Transaction[]
+  fullName.value = `${firstName} ${lastName}`
   try {
     loading.value = true
 
     const { sum, assetPrices } = await computeAssetsPrices(digitalWallet)
 
-    walletBalance.value = sum ?? 0
+    if (sum)
+      walletBalance.value = sum
 
     data.value = {
       labels: (digitalWallet as DigitalWallet).map(a => `${a.name} (${a.asset_id})`),
@@ -99,7 +105,7 @@ const signOut = async () => {
       <CubeLoader />
     </div>
     <div v-else class="flex flex-col gap-y-5 items-center">
-      <p class="text-xl">Glad to see you again {{ `${firstName} ${lastName}` }}</p>
+      <p class="text-xl">Glad to see you again {{ fullName }}</p>
       <p class="text-3xl font-semibold">{{ formattedWalletBalance }}</p>
       <p :class="`text-xl font-semibold ${getColor}`">{{ formattedProfitLoss }}</p>
       <button class="btn btn-sky" @click="privateMode = !privateMode">
@@ -110,6 +116,6 @@ const signOut = async () => {
 
     <CustomChart v-if="!privateMode && data" type="doughnut" :data="data" title="Allocation" />
 
-    <UserTransactions :transactions="transactions" />
+    <UserTransactions :transactions="userTransactions" />
   </div>
 </template>

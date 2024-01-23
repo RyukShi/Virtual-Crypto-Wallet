@@ -15,7 +15,7 @@ const signUpMode = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
 
-const toggleButtonLabel = computed(() => (signUpMode) ? 'You have already an account ?' : 'Register now !')
+const toggleButtonLabel = computed(() => (signUpMode.value) ? 'You have already an account ?' : 'Register now !')
 
 const submittedForm = async () => {
   const data: UserAuthenticationData = { password: password.value, email: email.value }
