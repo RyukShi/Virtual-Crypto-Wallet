@@ -79,7 +79,6 @@ export const useAPIStore = defineStore('api-store', () => {
 
         if (assetIcons.value.length === 0) {
           const assetIconsJson = await getAssetIcons()
-          console.log(assetIconsJson)
           if (assetIconsJson)
             assetIcons.value = assetIconsJson
         }
@@ -107,8 +106,8 @@ export const useAPIStore = defineStore('api-store', () => {
     }
   }
 
-  const getAssetById = async (assetId: string) => {
-    if (shouldPerformUpdate()) {
+  const getAssetById = async (assetId: string, performUpdate: boolean = false) => {
+    if (performUpdate || shouldPerformUpdate()) {
       try {
         loading.value = true
         const res = await fetch(`${COINAPI_URI}/assets/${assetId}`, CONFIG)

@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import isEmail from 'validator/lib/isEmail'
-import { isSecurePassword } from '../utils'
-import { useUserStore } from '@/stores/user-store'
+import { useUserStore, type UserAuthenticationData } from '@/stores/user-store'
 
 const email = ref('')
 const confirmEmail = ref('')
@@ -14,57 +12,13 @@ const lastName = ref('')
 
 const signUpMode = ref(false)
 
-const errorMessages = {
-  email: null,
-  password: null,
-  confirmEmail: null,
-  confirmPassword: null,
-}
-
 const userStore = useUserStore()
 const router = useRouter()
 
-const isSameEmail = computed(() => email.value === confirmEmail.value)
-const isSamePassword = computed(() => password.value === confirmPassword.value)
-const isValidEmail = computed(() => isEmail(email.value))
-const isValidPassword = computed(() => isSecurePassword(password.value))
-const isFormComplete = computed(() => {
-  let formFields = null
-  if (signUpMode.value) {
-    formFields = [
-      email.value, confirmEmail.value, password.value,
-      confirmPassword.value, firstName.value, lastName.value
-    ]
-  } else {
-    formFields = [ email.value, password.value ]
-  }
-  return formFields.every((field) => field !== '')
-})
-
-const isValidForm = computed(() => {
-  if (!isFormComplete.value || !isValidEmail.value || !isValidPassword.value[0]) return false
-  else if (confirmEmail.value && !isSameEmail.value) return false
-  else if (confirmPassword.value && !isSamePassword.value) return false
-  else return true
-})
-
-watch([isValidEmail, isSameEmail, isSamePassword, isValidPassword], (values) => {
-  const [validEmail, sameEmail, samePassword, validPassword] = values
-  if (!validEmail) errorMessages.email = 'Invalid email'
-  else errorMessages.email = null
-
-  if (signUpMode.value && !sameEmail) errorMessages.confirmEmail = 'Emails do not match'
-  else errorMessages.confirmEmail = null
-
-  if (signUpMode.value && !samePassword) errorMessages.confirmPassword = 'Passwords do not match'
-  else errorMessages.confirmPassword = null
-
-  if (signUpMode.value && !validPassword[0]) errorMessages.password = validPassword[1]
-  else errorMessages.password = null
-})
+const toggleButtonLabel = computed(() => (signUpMode) ? 'You have already an account ?' : 'Register now !')
 
 const submittedForm = async () => {
-  const data = { password: password.value, email: email.value }
+  const data: UserAuthenticationData = { password: password.value, email: email.value }
   if (signUpMode.value) {
     data.email = email.value
     data.password = password.value
@@ -84,11 +38,9 @@ const submittedForm = async () => {
     <form class="auth-form" @submit.prevent="submittedForm">
       <div>
         <input type="email" v-model="email" required placeholder="Your e-mail" />
-        <p v-if="errorMessages.email" class="error-message">{{ errorMessages.email }}</p>
       </div>
       <div v-if="signUpMode">
         <input type="email" v-model="confirmEmail" required placeholder="Confirm your e-mail" />
-        <p v-if="errorMessages.confirmEmail" class="error-message">{{ errorMessages.confirmEmail }}</p>
       </div>
       <div class="flex gap-x-4" v-if="signUpMode">
         <input type="text" v-model="firstName" required placeholder="Your firstname" />
@@ -96,16 +48,14 @@ const submittedForm = async () => {
       </div>
       <div>
         <input type="password" v-model="password" required placeholder="Your password" />
-        <p v-if="errorMessages.password" class="error-message">{{ errorMessages.password }}</p>
       </div>
       <div v-if="signUpMode">
         <input type="password" v-model="confirmPassword" required placeholder="Confirm your password" />
-        <p v-if="errorMessages.confirmPassword" class="error-message">{{ errorMessages.confirmPassword }}</p>
       </div>
       <div class="flex flex-col items-center gap-y-10">
-        <button :disabled="!isValidForm" class="btn btn-sky" type="submit">{{ (signUpMode) ? 'Sign up' : 'Sign in' }}</button>
+        <button class="btn btn-sky" type="submit">{{ (signUpMode) ? 'Sign up' : 'Sign in' }}</button>
         <button class="btn btn-sky" type="button" @click="signUpMode = !signUpMode">
-          {{ (signUpMode) ? 'You have already an account ?' : 'Register now !' }}
+          {{ toggleButtonLabel }}
         </button>
         <RouterLink v-if="!signUpMode" to="/account-recovery">Forgot password ?</RouterLink>
       </div>

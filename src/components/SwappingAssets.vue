@@ -3,25 +3,32 @@ import { ref, computed, onBeforeMount } from 'vue'
 import { useRoute } from 'vue-router'
 import { getRandomColor } from '../utils'
 import CubeLoader from './CubeLoader.vue'
-import { useUserStore } from '@/stores/user-store'
+import { useUserStore, type DigitalCurrency, type DigitalWallet, type Transaction } from '@/stores/user-store'
 import { useAPIStore } from '@/stores/api-store'
+import { getToAssetAmount } from '@/common/crypto-utils'
 
 const userStore = useUserStore()
 const APIStore = useAPIStore()
 const route = useRoute()
 
-const { assetId } = route.params
-const { digitalWallet, transactions } = userStore.user.user_metadata
-
-const selectedAsset = ref()
-const amount = ref<number>()
+const selectedAsset = ref<DigitalCurrency>()
+const fromAssetAmount = ref<number>()
 const destinationAssetId = ref<string>()
+const selectedAssetType = ref<number>()
 const loading = ref(false)
-const selectedAssetType = ref()
+const digitalWallet = ref<DigitalWallet>([]);
+const transactions = ref<Transaction[]>([]);
 
 onBeforeMount(() => {
-  selectedAssetType.value = Number.parseInt(isCrypto)
-  destinationAssetId.value = (assetId !== undefined) ? assetId : ''
+  let { assetId, assetType } = route.query
+  destinationAssetId.value = (assetId !== undefined) ? assetId as string : ''
+
+  selectedAssetType.value = Number(assetType)
+
+  if (userStore.user?.user_metadata) {
+    digitalWallet.value = userStore.user.user_metadata.digitalWallet
+    transactions.value = userStore.user.user_metadata.transactions
+  }
 })
 
 const getFilteredAsset = computed(() => {
@@ -32,12 +39,12 @@ const getFilteredAsset = computed(() => {
   )
 })
 const isNotCompleteForm = computed(() =>
-  !selectedAsset.value || !amount.value || !destinationAssetId.value
+  !selectedAsset.value || !fromAssetAmount.value || !destinationAssetId.value
 )
-const isNotValidNumber = computed(() => !!amount.value && isNaN(amount.value))
+const isNotValidNumber = computed(() => !!fromAssetAmount.value && isNaN(fromAssetAmount.value))
 const isNotValidAmount = computed(() => {
-  if (amount.value && selectedAsset.value)
-    return parseFloat(amount.value) > selectedAsset.value.balance
+  if (fromAssetAmount.value && selectedAsset.value)
+    return fromAssetAmount.value > selectedAsset.value.balance
   else return false
 })
 const isSameAsset = computed(() => {
@@ -52,57 +59,68 @@ const PERCENTAGE_OPTIONS = [
 ]
 
 const handleSubmit = async () => {
-  const { asset_id: fromAssetId, balance: fromAssetBalance, name: fromAssetName } = selectedAsset.value
+  const fromAssetId = selectedAsset.value?.asset_id
+  const fromAssetBalance = selectedAsset.value?.balance
+  const fromAssetName = selectedAsset.value?.name
   const toAssetId = destinationAssetId.value
-  const fromAssetAmount = parseFloat(amount.value)
+
+  /* TODO handle this error */
+  if (!fromAssetId || !fromAssetBalance || !fromAssetName || !toAssetId || !fromAssetAmount.value || !toAssetId) return
+
   let fromAssetFullName = `${fromAssetName} (${fromAssetId})`
-  if (confirm(`Are you sure you want to swap ${fromAssetAmount.toFixed(4)} ${fromAssetFullName} for the equivalent in ${toAssetId} ?`)) {
+  if (confirm(`Are you sure you want to swap ${fromAssetAmount.value.toFixed(4)} ${fromAssetFullName} for the equivalent in ${toAssetId} ?`)) {
     try {
       loading.value = true
-      const [{ price_usd: fromAssetPrice }] = await APIStore.getAssetById(fromAssetId)
-      const [{ price_usd: toAssetPrice, name: toAssetName }] = await APIStore.getAssetById(toAssetId)
-      /* Calcul du montant de l'actif d'arrivée */
-      const toAssetAmount = (fromAssetAmount * fromAssetPrice) / toAssetPrice
-      /* Calcul de la nouvelle balance */
-      const newFromAssetBalance = fromAssetBalance - fromAssetAmount
-      /* Vérification de la présence de toAsset */
-      const toAsset = digitalWallet.find(a => a.asset_id === toAssetId)
+      const fromAsset = await APIStore.getAssetById(fromAssetId, true)
+      const toAsset = await APIStore.getAssetById(toAssetId, true)
 
-      if (toAsset) {
-        toAsset.balance += toAssetAmount
+      /* TODO handle this error */
+      if (!fromAsset || !toAsset) return
+
+      const toAssetAmount = getToAssetAmount(fromAssetAmount.value, fromAsset, toAsset)
+
+      const newFromAssetBalance = fromAssetBalance - fromAssetAmount.value
+
+      const isFoundToAsset = digitalWallet.value.find(a => a.asset_id === toAssetId)
+
+      if (isFoundToAsset) {
+        isFoundToAsset.balance += toAssetAmount
       } else {
-        digitalWallet.push({
+        digitalWallet.value.push({
           asset_id: toAssetId,
           balance: toAssetAmount,
-          name:  toAssetName,
+          name: toAsset.name,
           color: getRandomColor()
         })
       }
       if (newFromAssetBalance > 0) {
         /* Update fromAsset balance */
-        digitalWallet.find(a => a.asset_id === fromAssetId).balance = newFromAssetBalance
+        const isFoundFromAsset = digitalWallet.value.find(a => a.asset_id === fromAssetId)
+        if (isFoundFromAsset) {
+          isFoundFromAsset.balance = newFromAssetBalance
+        }
       } else {
         /* Remove fromAsset object from digitalWallet */
-        const index = digitalWallet.findIndex(a => a.asset_id === fromAssetId)
-        if (index !== -1) digitalWallet.splice(index, 1)
+        const index = digitalWallet.value.findIndex(a => a.asset_id === fromAssetId)
+        if (index !== -1) digitalWallet.value.splice(index, 1)
         selectedAsset.value = undefined
       }
       /* Update digitalWallet */
-      await userStore.updateDigitalWallet(digitalWallet)
+      await userStore.updateDigitalWallet(digitalWallet.value)
       /* Update transactions */
-      transactions.push({
+      transactions.value.push({
         date: new Date().toLocaleString(),
         type: 'swap',
         from_asset_id: fromAssetId,
         to_asset_id: toAssetId,
-        from_asset_amount: fromAssetAmount,
+        from_asset_amount: fromAssetAmount.value,
         to_asset_amount: toAssetAmount
       })
-      await userStore.updateTransactions(transactions)
+      await userStore.updateTransactions(transactions.value)
       /* Display alert for user */
-      alert(`You exchanged ${fromAssetAmount.toFixed(4)} ${fromAssetFullName} for ${toAssetAmount.toFixed(4)} ${toAssetName} (${toAssetId}). Your new ${fromAssetFullName} balance is ${newFromAssetBalance.toFixed(4)}.`)
+      alert(`You exchanged ${fromAssetAmount.value.toFixed(4)} ${fromAssetFullName} for ${toAssetAmount.toFixed(4)} ${toAsset.name} (${toAssetId}). Your new ${fromAssetFullName} balance is ${newFromAssetBalance.toFixed(4)}.`)
       /* Reset amount input */
-      amount.value = undefined
+      fromAssetAmount.value = undefined
     } catch (err) {
       console.error(err)
     } finally {
@@ -112,7 +130,9 @@ const handleSubmit = async () => {
 }
 
 const handleClick = (percentage: number) => {
-  amount.value = selectedAsset.value.balance * percentage
+  if (selectedAsset.value) {
+    fromAssetAmount.value = selectedAsset.value.balance * percentage
+  }
 }
 </script>
 
@@ -136,9 +156,7 @@ const handleClick = (percentage: number) => {
 
       <select v-model="selectedAsset" required>
         <option :value="null">Choose an asset to swap</option>
-        <option v-for="asset in digitalWallet"
-          :key="asset.asset_id"
-          :value="asset">
+        <option v-for="asset in digitalWallet" :key="asset.asset_id" :value="asset">
           {{ `${asset.name} (${asset.asset_id})` }}
         </option>
       </select>
@@ -148,8 +166,8 @@ const handleClick = (percentage: number) => {
       </div>
 
       <div>
-        <input v-show="selectedAsset" type="text" v-model="amount"
-        placeholder="Please choose an amount" required />
+        <input v-show="selectedAsset" type="text" v-model.number="fromAssetAmount" placeholder="Please choose an amount"
+          required />
         <p v-if="isNotValidNumber" class="error-message">Please enter a valid number</p>
         <p v-else-if="isNotValidAmount" class="error-message">
           The amount is greater than the available balance
@@ -157,10 +175,7 @@ const handleClick = (percentage: number) => {
       </div>
 
       <div v-show="selectedAsset" class="flex justify-between">
-        <button v-for="p in PERCENTAGE_OPTIONS"
-          :key="p.value"
-          type="button"
-          class="btn btn-sky"
+        <button v-for="p in PERCENTAGE_OPTIONS" :key="p.value" type="button" class="btn btn-sky"
           @click="handleClick(p.value)">
           {{ p.label }}
         </button>
@@ -168,17 +183,13 @@ const handleClick = (percentage: number) => {
 
       <select v-show="selectedAsset" v-model="destinationAssetId" required>
         <option :value="null">Choose an destination asset</option>
-        <option v-for="asset in getFilteredAsset"
-          :key="asset.asset_id"
-          :value="asset.asset_id">
+        <option v-for="asset in getFilteredAsset" :key="asset.asset_id" :value="asset.asset_id">
           {{ `${asset.name} (${asset.asset_id})` }}
         </option>
       </select>
-      
+
       <div class="flex justify-between">
-        <button
-          :disabled="isNotCompleteForm || isNotValidNumber || isNotValidAmount || isSameAsset"
-          class="btn btn-sky"
+        <button :disabled="isNotCompleteForm || isNotValidNumber || isNotValidAmount || isSameAsset" class="btn btn-sky"
           type="submit">
           Swap !
         </button>
@@ -193,7 +204,6 @@ const handleClick = (percentage: number) => {
 
 <style scoped>
 .swap-form {
-  @apply flex flex-col gap-y-5 my-20 border-2
-  border-amber-500 rounded-lg p-10;
+  @apply flex flex-col gap-y-5 my-20 border-2 border-amber-500 rounded-lg p-10;
 }
 </style>

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { isSecurePassword } from '../utils'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user-store'
 
 const router = useRouter()
 

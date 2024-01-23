@@ -1,13 +1,5 @@
 <script setup lang="ts">
-
-type Transaction = {
-  date: string;
-  type: string;
-  from_asset_amount: number;
-  to_asset_amount: number;
-  to_asset_id: string;
-  from_asset_id: string;
-}
+import type { Transaction } from '@/stores/user-store'
 
 export type UserTransactionProps = {
   transactions: Transaction[]

@@ -30,7 +30,7 @@ onBeforeMount(async () => {
 
     <RouterLink
       class="btn btn-sky"
-      :to="{ name: 'swapping', params: { assetId: asset.asset_id } }">
+      :to="{ name: 'swapping', query: { assetId: asset.asset_id, assetType: asset.type_is_crypto.toString() } }">
       Buy / Swap
     </RouterLink>
   </div>

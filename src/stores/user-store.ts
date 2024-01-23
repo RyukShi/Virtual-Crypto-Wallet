@@ -2,16 +2,35 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { supabase } from '../supabase'
 import { useAPIStore } from './api-store'
+import type { User } from '@supabase/supabase-js'
 
-type UserAuthenticationData = {
+export type UserAuthenticationData = {
   email: string;
   password: string;
   firstName?: string;
   lastName?: string;
 }
 
+export type Transaction = {
+  date: string;
+  type: string;
+  from_asset_amount: number;
+  to_asset_amount: number;
+  to_asset_id: string;
+  from_asset_id: string;
+}
+
+export type DigitalCurrency = {
+  asset_id: string;
+  balance: number;
+  name: string;
+  color: string;
+}
+
+export type DigitalWallet = DigitalCurrency[]
+
 export const useUserStore = defineStore('user-store', () => {
-  const user = ref()
+  const user = ref<User>()
   const isAuthenticated = ref(false)
 
   const DEFAULT_REGISTRATION_ASSETS = [
@@ -84,7 +103,7 @@ export const useUserStore = defineStore('user-store', () => {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
       // reset store
-      user.value = null
+      user.value = undefined
       isAuthenticated.value = false
     } catch (error) {
       alert("An error has occurred during the logout process.")
@@ -118,7 +137,7 @@ export const useUserStore = defineStore('user-store', () => {
     }
   }
 
-  const updateDigitalWallet = async (newDigitalWallet) => {
+  const updateDigitalWallet = async (newDigitalWallet: DigitalWallet) => {
     try {
       const { error } = await supabase.auth.updateUser({
         data: { digitalWallet: newDigitalWallet }
@@ -129,7 +148,7 @@ export const useUserStore = defineStore('user-store', () => {
     }
   }
 
-  const updateTransactions = async (newTransactions) => {
+  const updateTransactions = async (newTransactions: Transaction[]) => {
     try {
       const { error } = await supabase.auth.updateUser({
         data: { transactions: newTransactions }

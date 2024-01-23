@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import isEmail from 'validator/lib/isEmail'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user-store'
 
 const router = useRouter()
 
