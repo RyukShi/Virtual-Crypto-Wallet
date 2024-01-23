@@ -20,7 +20,7 @@ export const useUserStore = defineStore('user-store', () => {
     { asset_id: 'USDC', color: '#3EC5A3', amount_usd: 1000 }
   ]
 
-  const authentication = async (signUpMode: boolean, data: UserAuthenticationData) => {
+  const authentication = async (signUpMode: boolean, userAuthData: UserAuthenticationData) => {
     const APIStore = useAPIStore()
     if (signUpMode) {
       try {
@@ -41,13 +41,15 @@ export const useUserStore = defineStore('user-store', () => {
             })
         )
         const { error } = await supabase.auth.signUp(
-          { email: data.email, password: data.password },
           {
-            data: {
-              firstName: data.firstName,
-              lastName: data.lastName,
-              digitalWallet: userAssets,
-              transactions: []
+            email: userAuthData.email, password: userAuthData.password,
+            options: {
+              data: {
+                firstName: userAuthData.firstName,
+                lastName: userAuthData.lastName,
+                digitalWallet: userAssets,
+                transactions: []
+              }
             }
           }
         )
@@ -62,12 +64,12 @@ export const useUserStore = defineStore('user-store', () => {
       }
     } else {
       try {
-        const { user: authUser, error } = await supabase.auth.signIn(
-          { email: data.email, password: data.password })
+        const { data, error } = await supabase.auth.signInWithPassword(
+          { email: userAuthData.email, password: userAuthData.password })
 
         if (error) throw error
 
-        user.value = authUser
+        user.value = data.user
         isAuthenticated.value = true
         return true
       } catch (error) {
@@ -92,7 +94,7 @@ export const useUserStore = defineStore('user-store', () => {
 
   const sendRecoveryPasswordLink = async (email: string) => {
     try {
-      const { error } = await supabase.auth.api.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: "http://localhost:5173/recovery-password"
       })
       if (error) throw error
@@ -105,11 +107,10 @@ export const useUserStore = defineStore('user-store', () => {
     }
   }
 
-  const updatePassword = async (password: string) => {
+  const updatePassword = async (newPassword: string) => {
     try {
-      const { user, error } = await supabase.auth.update({ password: password })
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
       if (error) throw error
-      if (user) console.log(user)
       alert("Your password has been successfully reinitialized, you'll be soon redirected to the login page.")
     } catch (error) {
       alert("An error has occurred during the recovery password process, please try again later.")
@@ -119,7 +120,7 @@ export const useUserStore = defineStore('user-store', () => {
 
   const updateDigitalWallet = async (newDigitalWallet) => {
     try {
-      const { error } = await supabase.auth.update({
+      const { error } = await supabase.auth.updateUser({
         data: { digitalWallet: newDigitalWallet }
       })
       if (error) throw error
@@ -130,7 +131,7 @@ export const useUserStore = defineStore('user-store', () => {
 
   const updateTransactions = async (newTransactions) => {
     try {
-      const { error } = await supabase.auth.update({
+      const { error } = await supabase.auth.updateUser({
         data: { transactions: newTransactions }
       })
       if (error) throw error
