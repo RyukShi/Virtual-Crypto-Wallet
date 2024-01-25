@@ -7,19 +7,11 @@
 
 @layer base {
     body {
-        @apply bg-sky-800 text-slate-50 mx-20;
+        @apply bg-sky-200;
     }
 
     html {
         font-family: 'JetBrains Mono', monospace;
-    }
-
-    select {
-        @apply bg-sky-900 px-4 py-2 rounded-lg;
-    }
-
-    input {
-        @apply bg-sky-900 px-4 py-2 rounded-lg outline-0 placeholder:text-slate-50;
     }
 }
 
