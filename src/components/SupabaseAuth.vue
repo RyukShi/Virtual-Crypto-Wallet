@@ -38,23 +38,22 @@ const handleSubmit = async () => {
 
 <template>
   <div class="centered">
-    <q-form class="p-4" ref="authForm" @submit.prevent="handleSubmit">
+    <q-form autofocus class="auth-form" ref="authForm" @submit.prevent="handleSubmit">
 
-      <q-input v-model="email" type="email" clearable required placeholder="Your e-mail" />
-      <q-input v-if="signUpMode" v-model="confirmEmail" type="email" clearable required
-        placeholder="Confirm your e-mail" />
+      <q-input v-model="email" type="email" outlined clearable required label="E-mail" />
+      <q-input v-if="signUpMode" v-model="confirmEmail" type="email" outlined clearable required label="Confirm e-mail" />
 
-      <div v-if="signUpMode">
-        <q-input v-model="firstName" clearable required placeholder="Your first name" />
-        <q-input v-model="lastName" clearable required placeholder="Your last name" />
+      <div v-if="signUpMode" class="flex justify-between">
+        <q-input v-model="firstName" outlined clearable required label="First name" />
+        <q-input v-model="lastName" outlined clearable required label="Last name" />
       </div>
 
-      <q-input v-model="password" type="password" clearable required placeholder="Your password" />
-      <q-input v-if="signUpMode" v-model="confirmPassword" type="password" clearable required
-        placeholder="Confirm your password" />
+      <q-input v-model="password" type="password" outlined clearable required label="Password" />
+      <q-input v-if="signUpMode" v-model="confirmPassword" type="password" outlined clearable required
+        label="Confirm password" />
 
-      <div class="mt-8">
-        <q-btn class="mr-4" :label="submitButtonLabel" type="submit" color="primary" />
+      <div class="flex justify-between">
+        <q-btn :label="submitButtonLabel" type="submit" color="primary" />
         <q-btn @click="signUpMode = !signUpMode" :label="toggleModeButtonLabel" type="button" color="primary" />
       </div>
 
