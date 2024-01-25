@@ -20,8 +20,8 @@ const userStore = useUserStore()
 
 <style scoped>
 nav {
-  @apply flex gap-x-4 text-lg bg-sky-900 py-2 px-10 max-w-max rounded-3xl
-  border-2 border-sky-900
+  @apply flex gap-x-4 text-lg bg-sky-100 py-2 px-10 max-w-max rounded-3xl
+  border-2 border-sky-100
   /* hover */
   hover:px-48 duration-700 hover:bg-transparent hover:border-amber-500;
 }

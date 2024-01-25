@@ -6,10 +6,6 @@
 @tailwind utilities;
 
 @layer base {
-    body {
-        @apply bg-sky-200;
-    }
-
     html {
         font-family: 'JetBrains Mono', monospace;
     }
@@ -47,7 +43,8 @@
     }
 
     .auth-form {
-        @apply my-10 p-10 bg-sky-700 rounded-lg flex flex-col gap-y-6;
+        @apply my-10 p-10 bg-sky-100 rounded-lg flex flex-col gap-y-6;
+        width: 600px;
     }
 
     .error-message {
