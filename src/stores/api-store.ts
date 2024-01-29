@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 type PeriodsVolume = {
@@ -11,7 +11,7 @@ export type Asset = {
   name: string;
   type_is_crypto: 0 | 1;
   asset_id: string;
-  iconUrl: string | null;
+  icon_url?: string;
   price_usd: number;
 } & PeriodsVolume
 
@@ -112,20 +112,33 @@ export const useAPIStore = defineStore('api-store', () => {
         loading.value = true
         const res = await fetch(`${COINAPI_URI}/assets/${assetId}`, CONFIG)
         const jsonAsset = await res.json()
-        return jsonAsset[0] as Asset
+        const icon = assetIcons.value.find(icon => icon.asset_id === jsonAsset.asset_id)
+        return { ...jsonAsset[0], icon_url: (icon) ? icon.url : undefined } as Asset
       } catch (error) {
         console.error(`Error fetching asset ${assetId}: ${error}`)
       } finally {
         loading.value = false
       }
     } else {
-      return assets.value.find(asset => asset.asset_id === assetId)
+      return getFilteredAssets.value.find(asset => asset.asset_id === assetId)
     }
   }
+
+  const getFilteredAssets = computed(() => {
+    // filtering assets for faster rendering
+    return assets.value.filter(asset =>
+      !isNaN(asset.price_usd) && asset.price_usd > 0 &&
+      asset.volume_1day_usd > Math.pow(10, 7)
+    ).map(asset => {
+      const icon = assetIcons.value.find(icon => icon.asset_id === asset.asset_id)
+      /* Add iconUrl property into object */
+      return { ...asset, icon_url: (icon) ? icon.url : undefined }
+    })
+  })
 
   return {
     assets, exchanges, loading, lastUpdate,
     getAssetsFromAPI, getExchangesFromAPI,
-    getAssetById, assetIcons
+    getAssetById, assetIcons, getFilteredAssets
   }
 })
