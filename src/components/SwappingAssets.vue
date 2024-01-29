@@ -31,12 +31,9 @@ onBeforeMount(() => {
   }
 })
 
-const getFilteredAsset = computed(() => {
-  return APIStore.assets.filter(asset =>
-    asset.type_is_crypto === selectedAssetType.value &&
-    !isNaN(asset.price_usd) && asset.price_usd > 0 &&
-    asset.volume_1day_usd > Math.pow(10, 7)
-  )
+const getFilteredAssets = computed(() => {
+  return APIStore.getFilteredAssets.filter(asset =>
+    asset.type_is_crypto === selectedAssetType.value)
 })
 const isNotCompleteForm = computed(() =>
   !selectedAsset.value || !fromAssetAmount.value || !destinationAssetId.value
@@ -189,7 +186,7 @@ const handleClick = (percentage: number) => {
 
       <select v-show="selectedAsset" v-model="destinationAssetId" required>
         <option :value="null">Choose an destination asset</option>
-        <option v-for="asset in getFilteredAsset" :key="asset.asset_id" :value="asset.asset_id">
+        <option v-for="asset in getFilteredAssets" :key="asset.asset_id" :value="asset.asset_id">
           {{ `${asset.name} (${asset.asset_id})` }}
         </option>
       </select>

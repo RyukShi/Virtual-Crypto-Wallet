@@ -2,7 +2,8 @@
 import { ref, computed, onBeforeMount } from 'vue'
 import CustomTable from './CustomTable.vue'
 import CubeLoader from './CubeLoader.vue'
-import { useAPIStore } from '@/stores/api-store'
+import { useAPIStore, type Asset } from '@/stores/api-store'
+import { formattedNumber } from '../utils'
 
 const APIStore = useAPIStore()
 
@@ -13,24 +14,31 @@ const TYPE_OPTIONS = [
   { type: 1, label: 'Crypto' },
   { type: 0, label: 'Fiat' }
 ]
-const columns = ['#', 'Symbol', 'Price', 'Day Volume', 'Details']
+
+const columns = [
+  {
+    name: 'asset-symbol', label: 'Symbol', align: 'left',
+    field: (row: Asset) => `${row.name} (${row.asset_id})`
+  },
+  {
+    name: 'asset-price', label: 'Price', align: 'left', field: 'price_usd',
+    format: (value: number) => formattedNumber(value)
+  },
+  {
+    name: 'asset-day-volume', label: 'Day Volume', align: 'left', field: 'volume_1day_usd',
+    format: (value: number) => formattedNumber(value)
+  },
+]
 /* refs */
 const assetInput = ref('')
 const selectedType = ref(TYPE_OPTIONS[1])
 
-const getFilteredAsset = computed(() => {
-  // filtering assets for faster rendering
-  return APIStore.assets.filter(asset =>
+const getFilteredAssets = computed(() => {
+  return APIStore.getFilteredAssets.filter(asset =>
     (selectedType.value?.type === -1 || selectedType.value?.type === asset.type_is_crypto) &&
-    !isNaN(asset.price_usd) && asset.price_usd > 0 &&
-    asset.volume_1day_usd > Math.pow(10, 7) &&
     ((assetInput.value === '') || (asset.name.toLowerCase().includes(assetInput.value.toLowerCase()) ||
       asset.asset_id.toLowerCase() === assetInput.value.toLowerCase()))
-  ).map(asset => {
-    const icon = APIStore.assetIcons.find(icon => icon.asset_id === asset.asset_id)
-    /* Add iconUrl property into object */
-    return { ...asset, iconUrl: (icon) ? icon.url : null }
-  })
+  )
 })
 </script>
 
@@ -42,7 +50,7 @@ const getFilteredAsset = computed(() => {
       </q-select>
       <q-input type="text" v-model="assetInput" outlined label="Asset ID or Name" />
     </div>
-    <CustomTable :columns="columns" :assets="getFilteredAsset" />
+    <CustomTable :columns="columns" :rows="getFilteredAssets" />
   </div>
   <div v-else class="centered my-20">
     <CubeLoader />

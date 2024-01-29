@@ -1,5 +1,7 @@
 export const formattedNumber = (n: number, digits: number = 2) => {
-  return '$ ' + n.toLocaleString("en-US", { maximumFractionDigits: digits });
+  if (!n) return ''
+  if (n > 0 && n <= 9.999999999999999) digits = 6
+  return '$ ' + n.toLocaleString("en-US", { maximumFractionDigits: digits })
 }
 
 export const isSecurePassword = (password: string) => {
