@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore, type UserAuthenticationData } from '@/stores/user-store'
 import type { QForm } from 'quasar'
+import { SECURE_PASSWORD_RULES_VALIDATIONS } from '@/common/security-utils'
 
 const email = ref('')
 const confirmEmail = ref('')
@@ -48,9 +49,10 @@ const handleSubmit = async () => {
         <q-input v-model="lastName" outlined clearable required label="Last name" />
       </div>
 
-      <q-input v-model="password" type="password" outlined clearable required label="Password" />
+      <q-input v-model="password" type="password" outlined clearable required label="Password"
+        :rules="SECURE_PASSWORD_RULES_VALIDATIONS" />
       <q-input v-if="signUpMode" v-model="confirmPassword" type="password" outlined clearable required
-        label="Confirm password" />
+        label="Confirm password" :rules="SECURE_PASSWORD_RULES_VALIDATIONS" />
 
       <div class="flex justify-between">
         <q-btn :label="submitButtonLabel" type="submit" color="primary" />
