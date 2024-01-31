@@ -1,7 +1,15 @@
 export const formattedNumber = (n: number, digits: number = 2) => {
-  if (!n) return ''
-  if (n > 0 && n <= 9.999999999999999) digits = 6
+  if (!n) return 'Invalid number'
+  if (n < 10) digits = 6
   return '$ ' + n.toLocaleString("en-US", { maximumFractionDigits: digits })
+}
+
+export const formattedDate = (d: Date) => {
+  if (!d) return 'Invalid date'
+  return d.toLocaleDateString("en-US", {
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: 'numeric', minute: 'numeric', second: 'numeric'
+  })
 }
 
 export const isSecurePassword = (password: string) => {

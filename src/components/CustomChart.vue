@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import Chart, { type ChartType, type ChartData } from 'chart.js/auto'
 
-export type CustomChartProps = {
+type CustomChartProps = {
   type: ChartType;
   data: ChartData;
   title: string;
@@ -25,7 +25,7 @@ onMounted(() => {
           text: props.title,
           color: '#f8fafc',
           font: {
-            size: 26,
+            size: 24,
             weight: 'normal',
             family: 'JetBrains Mono, monospace'
           }
@@ -35,7 +35,7 @@ onMounted(() => {
           labels: {
             color: '#f8fafc',
             font: {
-              size: 16,
+              size: 14,
               family: 'JetBrains Mono, monospace'
             }
           }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Transaction } from '@/stores/user-store'
 
-export type UserTransactionProps = {
+type UserTransactionProps = {
   transactions: Transaction[]
 }
 
