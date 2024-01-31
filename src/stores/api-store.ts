@@ -34,8 +34,8 @@ export const useAPIStore = defineStore('api-store', () => {
   const lastUpdate = ref<Date>()
 
   const COINAPI_URI = 'https://rest.coinapi.io/v1'
-  /* The time interval before allowing an update. (60 seconds)  */
-  const UPDATE_INTERVAL = 60000
+  /* The time interval before allowing an update. (60 seconds for production mode and 5 minutes for dev mode)  */
+  const UPDATE_INTERVAL = (import.meta.env.PROD) ? 60000 : 300000
 
   const CONFIG = {
     method: "GET",
@@ -112,7 +112,7 @@ export const useAPIStore = defineStore('api-store', () => {
         loading.value = true
         const res = await fetch(`${COINAPI_URI}/assets/${assetId}`, CONFIG)
         const jsonAsset = await res.json()
-        const icon = assetIcons.value.find(icon => icon.asset_id === jsonAsset.asset_id)
+        const icon = assetIcons.value.find(icon => icon.asset_id === jsonAsset[0].asset_id)
         return { ...jsonAsset[0], icon_url: (icon) ? icon.url : undefined } as Asset
       } catch (error) {
         console.error(`Error fetching asset ${assetId}: ${error}`)
@@ -139,6 +139,6 @@ export const useAPIStore = defineStore('api-store', () => {
   return {
     assets, exchanges, loading, lastUpdate,
     getAssetsFromAPI, getExchangesFromAPI,
-    getAssetById, assetIcons, getFilteredAssets
+    getAssetById, getFilteredAssets
   }
 })

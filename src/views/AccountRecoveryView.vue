@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import isEmail from 'validator/lib/isEmail'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user-store'
 
@@ -8,8 +7,6 @@ const router = useRouter()
 
 const emailRecovery = ref('')
 const userStore = useUserStore()
-
-const isValidEmail = computed(() => isEmail(emailRecovery.value))
 
 const handleSubmit = async () => {
   await userStore.sendRecoveryPasswordLink(emailRecovery.value)
@@ -19,25 +16,11 @@ const handleSubmit = async () => {
 
 <template>
   <div class="centered">
-    <form class="auth-form"
-      @submit.prevent="handleSubmit">
-      <div>
-        <input type="email" v-model="emailRecovery" placeholder="Enter your e-mail" />
-        <p v-if="emailRecovery && !isValidEmail" class="error-message">Invalid email</p>
+    <q-form autofocus class="auth-form" @submit.prevent="handleSubmit">
+      <q-input outlined clearable type="email" v-model="emailRecovery" label="E-mail" />
+      <div class="flex justify-center">
+        <q-btn type="submit" label="Send me recovery link" color="primary" />
       </div>
-      <div class="flex gap-x-4">
-        <button
-          :disabled="!isValidEmail"
-          type="submit"
-          class="btn btn-sky">
-          Send me recovery link
-        </button>
-        <RouterLink
-          class="btn btn-rose"
-          to="/login">
-          Cancel
-        </RouterLink>
-      </div>
-    </form>
+    </q-form>
   </div>
 </template>

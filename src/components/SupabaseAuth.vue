@@ -54,7 +54,7 @@ const handleSubmit = async () => {
 
       <div class="flex justify-between">
         <q-btn :label="submitButtonLabel" type="submit" color="primary" />
-        <q-btn @click="signUpMode = !signUpMode" :label="toggleModeButtonLabel" type="button" color="primary" />
+        <q-btn @click="signUpMode = !signUpMode" :label="toggleModeButtonLabel" type="button" color="positive" />
       </div>
 
       <RouterLink v-if="!signUpMode" to="/account-recovery">Forgot password ?</RouterLink>

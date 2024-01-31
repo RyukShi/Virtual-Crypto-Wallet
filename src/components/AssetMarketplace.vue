@@ -3,7 +3,7 @@ import { ref, computed, onBeforeMount } from 'vue'
 import CustomTable from './CustomTable.vue'
 import CubeLoader from './CubeLoader.vue'
 import { useAPIStore, type Asset } from '@/stores/api-store'
-import { formattedNumber } from '../utils'
+import { formattedNumber, formattedDate } from '../utils'
 
 const APIStore = useAPIStore()
 
@@ -50,6 +50,9 @@ const getFilteredAssets = computed(() => {
       </q-select>
       <q-input type="text" v-model="assetInput" outlined label="Asset ID or Name" />
     </div>
+    <span v-if="APIStore.lastUpdate">
+      Last update at {{ formattedDate(APIStore.lastUpdate) }}
+    </span>
     <CustomTable :columns="columns" :rows="getFilteredAssets" />
   </div>
   <div v-else class="centered my-20">
