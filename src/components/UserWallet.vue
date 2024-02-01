@@ -26,9 +26,8 @@ const walletBalance = ref(0)
 const profitLoss = ref(100.118)
 
 const computeAssetsPrices = async (digitalWallet: DigitalWallet) => {
-  var updatedAssets = await Promise.all(digitalWallet.map(digitalCurrency => APIStore.getAssetById(digitalCurrency.asset_id)))
-  /* flat updatedAssets array */
-  updatedAssets = updatedAssets.flat()
+  const updatedAssets = await Promise.all(digitalWallet.map(digitalCurrency => APIStore.getAssetById(digitalCurrency.asset_id)))
+  console.log(updatedAssets)
 
   const assetPrices = digitalWallet.map(digitalCurrency => {
     const foundAsset = updatedAssets.find(asset => asset?.asset_id === digitalCurrency.asset_id)
@@ -108,10 +107,8 @@ const signOut = async () => {
       <p class="text-xl">Glad to see you again {{ fullName }}</p>
       <p class="text-3xl font-semibold">{{ formattedWalletBalance }}</p>
       <p :class="`text-xl font-semibold ${getColor}`">{{ formattedProfitLoss }}</p>
-      <button class="btn btn-sky" @click="privateMode = !privateMode">
-        Private mode
-      </button>
-      <button class="btn btn-rose" @click="signOut">Sign out</button>
+      <q-btn @click="privateMode = !privateMode" label="Private mode" color="primary" />
+      <q-btn @click="signOut" label="Sign out" color="negative" />
     </div>
 
     <CustomChart v-if="!privateMode && data" type="doughnut" :data="data" title="Allocation" />

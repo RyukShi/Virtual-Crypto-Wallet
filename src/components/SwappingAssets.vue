@@ -141,16 +141,12 @@ const handleClick = (percentage: number) => {
 
 <template>
   <div>
-    <form v-show="!loading" class="swap-form" @submit.prevent="handleSubmit">
+    <q-form v-show="!loading" class="swap-form" @submit.prevent="handleSubmit">
 
       <h3 class="text-sm text-center">Choose the asset type to filter</h3>
-      <div class="centered gap-x-4">
-        <label> Crypto
-          <input type="radio" v-model="selectedAssetType" :value="1" />
-        </label>
-        <label> Fiat
-          <input type="radio" v-model="selectedAssetType" :value="0" />
-        </label>
+      <div class="centered">
+        <q-radio size="sm" v-model="selectedAssetType" :val="1" label="Crypto" />
+        <q-radio size="sm" v-model="selectedAssetType" :val="0" label="Fiat" />
       </div>
 
       <div v-if="isSameAsset">
@@ -169,19 +165,18 @@ const handleClick = (percentage: number) => {
       </div>
 
       <div>
-        <input v-show="selectedAsset" type="text" v-model.number="fromAssetAmount" placeholder="Please choose an amount"
+        <q-input v-show="selectedAsset" type="number" v-model.number="fromAssetAmount" label="Choose an amount"
           required />
-        <p v-if="isNotValidNumber" class="error-message">Please enter a valid number</p>
-        <p v-else-if="isNotValidAmount" class="error-message">
+        <p v-if="isNotValidAmount" class="error-message">
           The amount is greater than the available balance
         </p>
       </div>
 
       <div v-show="selectedAsset" class="flex justify-between">
-        <button v-for="p in PERCENTAGE_OPTIONS" :key="p.value" type="button" class="btn btn-sky"
-          @click="handleClick(p.value)">
-          {{ p.label }}
-        </button>
+        <q-btn-group>
+          <q-btn v-for="p in PERCENTAGE_OPTIONS" :key="p.label" type="button" :label="p.label" color="accent"
+            @click="handleClick(p.value)" />
+        </q-btn-group>
       </div>
 
       <select v-show="selectedAsset" v-model="destinationAssetId" required>
@@ -192,13 +187,11 @@ const handleClick = (percentage: number) => {
       </select>
 
       <div class="flex justify-between">
-        <button :disabled="isNotCompleteForm || isNotValidNumber || isNotValidAmount || isSameAsset" class="btn btn-sky"
-          type="submit">
-          Swap !
-        </button>
-        <button class="btn btn-rose" type="reset">Reset</button>
+        <q-btn :disabled="isNotCompleteForm || isNotValidNumber || isNotValidAmount || isSameAsset" label="Swap !"
+          type="submit" color="primary" />
+        <q-btn type="reset" label="Reset" color="negative" />
       </div>
-    </form>
+    </q-form>
     <div v-if="loading" class="my-20">
       <CubeLoader />
     </div>
