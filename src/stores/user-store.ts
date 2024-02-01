@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { supabase } from '../supabase'
 import { useAPIStore } from './api-store'
-import type { User } from '@supabase/supabase-js'
+import { AuthError, type User } from '@supabase/supabase-js'
 
 export type UserAuthenticationData = {
   email: string;
@@ -43,22 +43,28 @@ export const useUserStore = defineStore('user-store', () => {
     const APIStore = useAPIStore()
     if (signUpMode) {
       try {
-        const userAssets = await Promise.all(
+        const assetsUpdated = await Promise.all(
           DEFAULT_REGISTRATION_ASSETS
-            .map(async (asset) => {
-              const updateAsset = await APIStore.getAssetById(asset.asset_id)
-              if (!updateAsset) {
-                return
-              }
-              const b = asset.amount_usd / updateAsset.price_usd
-              delete asset.amount_usd
-              return {
-                ...asset,
-                name: updateAsset.name,
-                balance: b
-              }
-            })
+            .map(asset => APIStore.getAssetById(asset.asset_id, true))
         )
+
+        const digitalWallet = assetsUpdated
+          .map(asset => {
+            const findDefaultAsset = DEFAULT_REGISTRATION_ASSETS.find(
+              defaultAsset => defaultAsset.asset_id === asset?.asset_id)
+
+            if (findDefaultAsset && asset) {
+              const { asset_id, name, price_usd } = asset
+              const { amount_usd, color } = findDefaultAsset
+              return {
+                asset_id,
+                name,
+                balance: amount_usd / price_usd,
+                color
+              } as DigitalCurrency
+            }
+          })
+
         const { error } = await supabase.auth.signUp(
           {
             email: userAuthData.email, password: userAuthData.password,
@@ -66,7 +72,7 @@ export const useUserStore = defineStore('user-store', () => {
               data: {
                 firstName: userAuthData.firstName,
                 lastName: userAuthData.lastName,
-                digitalWallet: userAssets,
+                digitalWallet,
                 transactions: []
               }
             }
@@ -78,7 +84,7 @@ export const useUserStore = defineStore('user-store', () => {
         alert('Check your email to confirm your registration !')
         return true
       } catch (error) {
-        alert(error.error_description || error.message)
+        if (error instanceof AuthError) alert(error.message)
         return false
       }
     } else {
@@ -92,7 +98,7 @@ export const useUserStore = defineStore('user-store', () => {
         isAuthenticated.value = true
         return true
       } catch (error) {
-        alert(error.error_description || error.message)
+        if (error instanceof AuthError) alert(error.message)
         return false
       }
     }
