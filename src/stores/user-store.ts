@@ -81,11 +81,10 @@ export const useUserStore = defineStore('user-store', () => {
 
         if (error) throw error
 
-        alert('Check your email to confirm your registration !')
-        return true
+        return { success: true, message: 'Check your email to confirm your registration !' }
       } catch (error) {
-        if (error instanceof AuthError) alert(error.message)
-        return false
+        if (error instanceof AuthError)
+          return { success: false, message: error.message }
       }
     } else {
       try {
@@ -96,10 +95,11 @@ export const useUserStore = defineStore('user-store', () => {
 
         user.value = data.user
         isAuthenticated.value = true
-        return true
+        const { lastName, firstName } = user.value.user_metadata
+        return { success: true, message: `Glad to see you again ${firstName} ${lastName}` }
       } catch (error) {
-        if (error instanceof AuthError) alert(error.message)
-        return false
+        if (error instanceof AuthError)
+          return { success: false, message: error.message }
       }
     }
   }
