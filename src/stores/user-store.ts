@@ -83,8 +83,7 @@ export const useUserStore = defineStore('user-store', () => {
 
         return { success: true, message: 'Check your email to confirm your registration !' }
       } catch (error) {
-        if (error instanceof AuthError)
-          return { success: false, message: error.message }
+        return { success: false, message: (error as AuthError).message }
       }
     } else {
       try {
@@ -98,8 +97,7 @@ export const useUserStore = defineStore('user-store', () => {
         const { lastName, firstName } = user.value.user_metadata
         return { success: true, message: `Glad to see you again ${firstName} ${lastName}` }
       } catch (error) {
-        if (error instanceof AuthError)
-          return { success: false, message: error.message }
+        return { success: false, message: (error as AuthError).message }
       }
     }
   }
@@ -111,9 +109,17 @@ export const useUserStore = defineStore('user-store', () => {
       // reset store
       user.value = undefined
       isAuthenticated.value = false
+
+      return {
+        success: true,
+        message: "Logout completed successfully."
+      }
     } catch (error) {
-      alert("An error has occurred during the logout process.")
       console.error(error)
+      return {
+        success: false,
+        message: "An error has occurred during the logout process."
+      }
     }
   }
 
@@ -124,11 +130,17 @@ export const useUserStore = defineStore('user-store', () => {
       })
       if (error) throw error
 
-      alert(`A recovery email has been sent to ${email}, please verify and follow the instructions.`)
+      return {
+        success: true,
+        message: `A recovery email has been sent to ${email}, please verify and follow the instructions.`,
+      }
 
     } catch (error) {
-      alert("An error has occurred during the process, please try again later.")
       console.error(error)
+      return {
+        success: false,
+        message: "An error has occurred during the process, please try again later."
+      }
     }
   }
 
@@ -136,10 +148,17 @@ export const useUserStore = defineStore('user-store', () => {
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword })
       if (error) throw error
-      alert("Your password has been successfully reinitialized, you'll be soon redirected to the login page.")
+
+      return {
+        success: true,
+        message: "Your password has been successfully reinitialized.",
+      }
     } catch (error) {
-      alert("An error has occurred during the recovery password process, please try again later.")
       console.error(error)
+      return {
+        success: false,
+        message: "An error has occurred during the recovery password process, please try again later.",
+      }
     }
   }
 
@@ -149,8 +168,11 @@ export const useUserStore = defineStore('user-store', () => {
         data: { digitalWallet: newDigitalWallet }
       })
       if (error) throw error
+
+      return true
     } catch (error) {
       console.error(error)
+      return false
     }
   }
 
@@ -160,8 +182,11 @@ export const useUserStore = defineStore('user-store', () => {
         data: { transactions: newTransactions }
       })
       if (error) throw error
+
+      return true
     } catch (error) {
       console.error(error)
+      return false
     }
   }
 

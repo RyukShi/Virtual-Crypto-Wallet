@@ -7,10 +7,12 @@ import CubeLoader from './CubeLoader.vue'
 import UserTransactions from './UserTransactions.vue'
 import { useUserStore, type DigitalWallet, type Transaction } from '@/stores/user-store'
 import { useAPIStore } from '@/stores/api-store'
+import { useQuasar } from 'quasar'
 
 const userStore = useUserStore()
 const APIStore = useAPIStore()
 const router = useRouter()
+const $q = useQuasar()
 
 const stars = '********'
 
@@ -93,8 +95,12 @@ const getColor = computed(() => {
 })
 
 const signOut = async () => {
-  await userStore.logout()
-  router.push({ name: 'marketplace' })
+  const { success, message } = await userStore.logout()
+  $q.notify({
+    message,
+    color: (success) ? 'positive' : 'negative',
+  })
+  if (success) router.push({ name: 'marketplace' })
 }
 </script>
 

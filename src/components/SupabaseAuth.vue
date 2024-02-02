@@ -6,22 +6,28 @@ import type { QForm } from 'quasar'
 import { SECURE_PASSWORD_RULES, NOT_BLANK_RULE } from '@/common/security-utils'
 import { useQuasar } from 'quasar'
 
+/* String refs */
 const email = ref('')
 const confirmEmail = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const firstName = ref('')
 const lastName = ref('')
-
+/* Boolean refs */
 const signUpMode = ref(false)
+const showPassword = ref(false)
+
 const authForm = ref<QForm>()
 
 const userStore = useUserStore()
 const router = useRouter()
 const $q = useQuasar()
 
+/* Computed refs */
 const toggleModeButtonLabel = computed(() => (signUpMode.value) ? 'You have already an account ?' : 'Register now !')
 const submitButtonLabel = computed(() => (signUpMode.value) ? 'Sign up' : 'Sign in')
+const isNotSamePasswords = computed(() => !!confirmPassword.value && password.value !== confirmPassword.value)
+const isNotSameEmails = computed(() => !!confirmEmail.value && email.value !== confirmEmail.value)
 
 const handleSubmit = async () => {
   const isValidForm = await authForm.value?.validate()
@@ -61,19 +67,51 @@ const toggleMode = () => {
   <div class="centered">
     <q-form autofocus class="auth-form" ref="authForm" @submit.prevent="handleSubmit">
 
-      <q-input v-model="email" type="email" outlined clearable required label="E-mail" :rules="NOT_BLANK_RULE" />
-      <q-input v-if="signUpMode" v-model="confirmEmail" type="email" outlined clearable required label="Confirm e-mail"
-        :rules="NOT_BLANK_RULE" />
+      <q-input
+        v-model="email"
+        label="E-mail"
+        type="email"
+        :rules="NOT_BLANK_RULE"
+        outlined clearable required />
+      <q-input v-if="signUpMode"
+        v-model="confirmEmail"
+        label="Confirm e-mail"
+        type="email"
+        :rules="NOT_BLANK_RULE"
+        :error="isNotSameEmails"
+        error-message="The two emails do not match."
+        outlined clearable required />
 
       <div v-if="signUpMode" class="flex justify-between">
-        <q-input v-model="firstName" outlined clearable required label="First name" :rules="NOT_BLANK_RULE" />
-        <q-input v-model="lastName" outlined clearable required label="Last name" :rules="NOT_BLANK_RULE" />
+        <q-input v-model="firstName" label="First name"
+          :rules="NOT_BLANK_RULE" outlined clearable required />
+        <q-input v-model="lastName" label="Last name"
+          :rules="NOT_BLANK_RULE" outlined clearable required />
       </div>
 
-      <q-input v-model="password" type="password" outlined clearable required label="Password"
-        :rules="(signUpMode) ? SECURE_PASSWORD_RULES : undefined" />
-      <q-input v-if="signUpMode" v-model="confirmPassword" type="password" outlined clearable required
-        label="Confirm password" :rules="SECURE_PASSWORD_RULES" />
+      <q-input
+        v-model="password"
+        label="Password"
+        :type="(showPassword) ? 'text' : 'password'"
+        :rules="(signUpMode) ? SECURE_PASSWORD_RULES : undefined"
+        outlined clearable required>
+        <template #append>
+          <q-icon :name="(showPassword) ? 'visibility' : 'visibility_off'" class="cursor-pointer"
+            @click="showPassword = !showPassword" />
+        </template>
+      </q-input>
+      <q-input v-if="signUpMode"
+        v-model="confirmPassword"
+        label="Confirm password"
+        :type="(showPassword) ? 'text' : 'password'"
+        :error="isNotSamePasswords"
+        error-message="The two passwords do not match."
+        outlined clearable required>
+        <template #append>
+          <q-icon :name="(showPassword) ? 'visibility' : 'visibility_off'" class="cursor-pointer"
+            @click="showPassword = !showPassword" />
+        </template>
+      </q-input>
 
       <div class="flex justify-between">
         <q-btn :label="submitButtonLabel" type="submit" color="primary" />
