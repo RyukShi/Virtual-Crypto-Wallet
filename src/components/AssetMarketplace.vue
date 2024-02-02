@@ -52,7 +52,7 @@ const getFilteredAssets = computed(() => {
       </q-select>
       <q-input type="text" v-model="assetInput" outlined label="Asset ID or Name" />
     </div>
-    <span class="mt-2" v-if="APIStore.lastUpdate">
+    <span v-if="APIStore.lastUpdate">
       Last update at {{ formattedDate(APIStore.lastUpdate) }}
     </span>
     <CustomTable :columns="columns" :rows="getFilteredAssets" />

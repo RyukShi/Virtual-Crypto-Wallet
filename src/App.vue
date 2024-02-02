@@ -9,7 +9,6 @@ const userStore = useUserStore()
   <div class="centered mt-4">
     <nav>
       <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
       <RouterLink v-if="!userStore.isAuthenticated" to="/login">Login</RouterLink>
       <RouterLink v-else to="/my-wallet">Wallet</RouterLink>
     </nav>
