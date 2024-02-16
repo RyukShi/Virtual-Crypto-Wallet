@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import type { Transaction } from '@/stores/user-store'
+
+const router = useRouter()
 
 type UserTransactionProps = {
   transactions: Transaction[]
@@ -21,11 +24,13 @@ defineProps<UserTransactionProps>()
       </div>
     </div>
   </div>
-  <div v-else>
-    <h2 class="sub-title text-center">
-      No transactions, you can buy many assets
-      <RouterLink to="/swapping">here</RouterLink>
-    </h2>
+  <div v-else class="centered">
+    <q-banner rounded inline-actions class="text-white bg-primary">
+      No transactions, you can buy many assets !
+      <template #action>
+        <q-btn outline color="white" @click="router.push({ name: 'swapping' })" label="BUY ASSETS" />
+      </template>
+    </q-banner>
   </div>
 </template>
 

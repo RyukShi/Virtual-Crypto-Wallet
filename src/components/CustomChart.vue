@@ -23,7 +23,6 @@ onMounted(() => {
         title: {
           display: true,
           text: props.title,
-          color: '#f8fafc',
           font: {
             size: 24,
             weight: 'normal',
@@ -33,7 +32,6 @@ onMounted(() => {
         legend: {
           position: 'right',
           labels: {
-            color: '#f8fafc',
             font: {
               size: 14,
               family: 'JetBrains Mono, monospace'
@@ -47,7 +45,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="my-20 max-w-2xl">
+  <div class="my-20 centered">
     <canvas ref="customChart" />
   </div>
 </template>
