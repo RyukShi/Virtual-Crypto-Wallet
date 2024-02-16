@@ -48,8 +48,8 @@ const getFilteredAssets = computed(() => {
   <div v-if="!APIStore.loading" class="my-20">
     <div class="centered gap-x-4 mb-20">
       <q-select v-model="selectedType" outlined transition-show="flip-up" transition-hide="flip-down"
-        :options="TYPE_OPTIONS" label="Asset type" style="width: 200px;">
-      </q-select>
+        :options="TYPE_OPTIONS" label="Asset type" style="width: 200px;" />
+
       <q-input type="text" v-model="assetInput" outlined label="Asset ID or Name" />
     </div>
     <span v-if="APIStore.lastUpdate">

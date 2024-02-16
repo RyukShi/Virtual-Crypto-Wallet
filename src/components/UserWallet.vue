@@ -8,6 +8,8 @@ import UserTransactions from './UserTransactions.vue'
 import { useUserStore, type DigitalWallet, type Transaction } from '@/stores/user-store'
 import { useAPIStore } from '@/stores/api-store'
 import { useQuasar } from 'quasar'
+import { getUserTransactions, getUserWallet } from '@/common/supabase-utils'
+import type { ChartData } from 'chart.js'
 
 const userStore = useUserStore()
 const APIStore = useAPIStore()
@@ -16,7 +18,7 @@ const $q = useQuasar()
 
 const stars = '********'
 
-const data = ref()
+const data = ref<ChartData>()
 const userTransactions = ref<Transaction[]>([])
 const fullName = ref()
 /* Boolean refs */
@@ -29,7 +31,6 @@ const profitLoss = ref(100.118)
 
 const computeAssetsPrices = async (digitalWallet: DigitalWallet) => {
   const updatedAssets = await Promise.all(digitalWallet.map(digitalCurrency => APIStore.getAssetById(digitalCurrency.asset_id)))
-  console.log(updatedAssets)
 
   const assetPrices = digitalWallet.map(digitalCurrency => {
     const foundAsset = updatedAssets.find(asset => asset?.asset_id === digitalCurrency.asset_id)
@@ -49,13 +50,22 @@ onBeforeMount(async () => {
     router.push({ name: 'marketplace' })
     return
   }
-  const { firstName, lastName, transactions, digitalWallet } = userStore.user.user_metadata
-  userTransactions.value = transactions as Transaction[]
+  const { firstName, lastName } = userStore.user.user_metadata
   fullName.value = `${firstName} ${lastName}`
+
   try {
     loading.value = true
 
+    const digitalWallet = await getUserWallet(userStore.user.id)
+
+    if (!digitalWallet) {
+      router.push({ name: 'marketplace' })
+      return
+    }
+
     const { sum, assetPrices } = await computeAssetsPrices(digitalWallet)
+
+    userTransactions.value = await getUserTransactions(userStore.user.id) ?? []
 
     if (sum)
       walletBalance.value = sum
@@ -115,10 +125,11 @@ const signOut = async () => {
       <p :class="`text-xl font-semibold ${getColor}`">{{ formattedProfitLoss }}</p>
       <q-btn @click="privateMode = !privateMode" label="Private mode" color="primary" />
       <q-btn @click="signOut" label="Sign out" color="negative" />
+      <q-btn @click="router.push({ name: 'swapping' })" label="Swapping" color="accent" />
     </div>
 
     <CustomChart v-if="!privateMode && data" type="doughnut" :data="data" title="Allocation" />
 
-    <UserTransactions :transactions="userTransactions" />
+    <UserTransactions v-show="!loading && !privateMode" :transactions="userTransactions" />
   </div>
 </template>

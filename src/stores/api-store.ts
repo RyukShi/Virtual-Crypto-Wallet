@@ -112,6 +112,9 @@ export const useAPIStore = defineStore('api-store', () => {
         loading.value = true
         const res = await fetch(`${COINAPI_URI}/assets/${assetId}`, CONFIG)
         const jsonAsset = await res.json()
+
+        if (!jsonAsset) throw new Error('Json data is not valid')
+
         const icon = assetIcons.value.find(icon => icon.asset_id === jsonAsset[0].asset_id)
         return { ...jsonAsset[0], icon_url: (icon) ? icon.url : undefined } as Asset
       } catch (error) {
