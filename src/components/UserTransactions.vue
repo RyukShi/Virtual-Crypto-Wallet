@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import type { Transaction } from '@/stores/user-store'
+import { formattedDate } from '@/utils'
 
 const router = useRouter()
 
@@ -16,12 +17,14 @@ defineProps<UserTransactionProps>()
     <h2 class="sub-title text-center">
       Your transactions
     </h2>
-    <div class="flex flex-col gap-y-5 items-center justify-center">
-      <div v-for="t in transactions" class="transaction" :key="t.date">
-        <h3>{{ `${t.type} ${t.date}` }}</h3>
-        <p>{{ `From asset : ${t.from_asset_amount} ${t.from_asset_id}` }}</p>
-        <p>{{ `To asset : ${t.to_asset_amount} ${t.to_asset_id}` }}</p>
-      </div>
+    <div class="grid grid-cols-4 gap-4">
+      <q-card class="bg-primary" v-for="t in transactions" :key="t.date" bordered>
+        <q-card-section>{{ formattedDate(t.date) }}</q-card-section>
+        <q-card-section>
+          <p>{{ `From asset : ${t.from_asset_amount} ${t.from_asset_id}` }}</p>
+          <p>{{ `To asset : ${t.to_asset_amount} ${t.to_asset_id}` }}</p>
+        </q-card-section>
+      </q-card>
     </div>
   </div>
   <div v-else class="centered">
@@ -33,13 +36,3 @@ defineProps<UserTransactionProps>()
     </q-banner>
   </div>
 </template>
-
-<style scoped>
-.transaction {
-  @apply bg-sky-900 p-8 rounded-lg border-2 text-center max-w-max;
-}
-
-.transaction h3 {
-  @apply text-lg mb-4;
-}
-</style>

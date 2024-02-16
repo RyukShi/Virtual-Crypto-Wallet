@@ -4,9 +4,15 @@ export const formattedNumber = (n: number, digits: number = 2) => {
   return '$ ' + n.toLocaleString("en-US", { maximumFractionDigits: digits })
 }
 
-export const formattedDate = (d: Date) => {
+export const formattedDate = (d: Date | string, locale: Intl.LocalesArgument = "en-US") => {
   if (!d) return 'Invalid date'
-  return d.toLocaleDateString("en-US", {
+
+  let tmpDate: Date
+  /* Convert string timestamp to Date */
+  if (typeof d === 'string') tmpDate = new Date(d)
+  else tmpDate = d
+
+  return tmpDate.toLocaleDateString(locale, {
     year: 'numeric', month: 'numeric', day: 'numeric',
     hour: 'numeric', minute: 'numeric', second: 'numeric'
   })
