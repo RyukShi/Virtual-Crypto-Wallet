@@ -7,7 +7,7 @@ import { formattedNumber, formattedDate } from '../utils'
 
 const APIStore = useAPIStore()
 
-onBeforeMount(() => APIStore.getAssetsFromAPI())
+onBeforeMount(async () => { await APIStore.getAssetsFromAPI() })
 
 const TYPE_OPTIONS = [
   { type: -1, label: 'All' },
@@ -31,7 +31,7 @@ const columns = [
     rawSort: (a: number, b: number) => a - b,
   },
 ]
-/* refs */
+
 const assetInput = ref('')
 const selectedType = ref(TYPE_OPTIONS[1])
 
@@ -55,7 +55,7 @@ const getFilteredAssets = computed(() => {
     <span v-if="APIStore.lastUpdate">
       Last update at {{ formattedDate(APIStore.lastUpdate) }}
     </span>
-    <CustomTable :columns="columns" :rows="getFilteredAssets" />
+    <CustomTable :columns="columns" :rows="getFilteredAssets" title="Assets" />
   </div>
   <div v-else class="centered my-20">
     <CubeLoader />
