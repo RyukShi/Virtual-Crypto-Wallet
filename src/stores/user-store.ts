@@ -43,43 +43,26 @@ export const useUserStore = defineStore('user-store', () => {
   const authentication = async (signUpMode: boolean, userAuthData: UserAuthenticationData) => {
     const APIStore = useAPIStore()
     if (signUpMode) {
-
-      const getFailedIndices = (assets: Array<Asset | undefined>) => {
-        const indices = []
-        for (let i = 0; i < assets.length; i++)
-          if (assets[i]?.asset_id === undefined) indices.push(i)
-        return indices
-      }
-
       try {
-        debugger
-        const assetsPromises = DEFAULT_REGISTRATION_ASSETS
-          .map(asset => APIStore.getAssetById(asset.asset_id, true))
+        const assetsResults: Array<Asset> = []
 
-        const assetsResults = await Promise.all(assetsPromises)
-
-        let failedIndices = getFailedIndices(assetsResults)
-
-        const MAX_RETRY = 10
-        let count = 0
-
-        while (failedIndices.length > 0 && count <= MAX_RETRY) {
-
-          const refetchAssetsResults = await Promise.all(
-            failedIndices.map(i => APIStore.getAssetById(DEFAULT_REGISTRATION_ASSETS[i].asset_id, true))
-          )
-          failedIndices = getFailedIndices(refetchAssetsResults)
-
-          refetchAssetsResults.forEach((asset, index) => {
-            if (asset?.asset_id) assetsResults[index] = asset
-          })
-          count += 1
+        for (const asset of DEFAULT_REGISTRATION_ASSETS) {
+          let result = await APIStore.getAssetById(asset.asset_id, true)
+          if (result?.asset_id) {
+            assetsResults.push(result)
+          } else {
+            const MAX_RETRY = 10
+            let count = 0
+            while (!result && count < MAX_RETRY) {
+              result = await APIStore.getAssetById(asset.asset_id, true)
+              count++
+            }
+            if (result?.asset_id) assetsResults.push(result)
+          }
         }
 
         const digitalWallet = assetsResults
           .map(asset => {
-            if (!asset?.asset_id) return
-
             const findDefaultAsset = DEFAULT_REGISTRATION_ASSETS.find(
               defaultAsset => defaultAsset.asset_id === asset.asset_id)
 
@@ -113,7 +96,7 @@ export const useUserStore = defineStore('user-store', () => {
           { digital_wallet: digitalWallet, user_id: data.user?.id }
         ], Tables.DigitalWallets)
 
-        console.log(success)
+        if (!success) throw new Error('An error has occurred during the registration process, please try again later.')
 
         return { success: true, message: 'Check your email to confirm your registration !' }
       } catch (error) {
