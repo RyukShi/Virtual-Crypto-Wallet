@@ -5,7 +5,9 @@ import Chart, { type ChartType, type ChartData } from 'chart.js/auto'
 type CustomChartProps = {
   type: ChartType;
   data: ChartData;
-  title: string;
+  title?: string;
+  showLegend?: boolean;
+  scales?: any;
 }
 
 const props = defineProps<CustomChartProps>()
@@ -21,24 +23,24 @@ onMounted(() => {
     options: {
       plugins: {
         title: {
-          display: true,
+          display: Boolean(props.title),
           text: props.title,
           font: {
             size: 24,
-            weight: 'normal',
-            family: 'JetBrains Mono, monospace'
+            weight: 'normal'
           }
         },
         legend: {
+          display: props.showLegend,
           position: 'right',
           labels: {
             font: {
-              size: 14,
-              family: 'JetBrains Mono, monospace'
+              size: 14
             }
           }
         }
-      }
+      },
+      scales: props.scales
     }
   })
 })
